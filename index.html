@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACL F&amp;B — Dashboard V2</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --primary: #1a1a2e; --primary-light: #16213e; --accent: #0f3460;
+  --gold: #c9a227; --cyan: #0891b2; --green: #059669; --amber: #d97706; --red: #dc2626;
+  --bg: #f0f2f5; --card: #ffffff; --ink: #1a1a2e; --muted: #6b7280; --line: #e5e7eb;
+  --good: #059669; --good-bg: #ecfdf5; --bad: #dc2626; --bad-bg: #fef2f2;
+  --warn: #d97706; --warn-bg: #fffbeb; --info: #2563eb; --info-bg: #eff6ff;
+  --radius: 12px; --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --dead: #9ca3af; --slow: #f59e0b; --moderate: #3b82f6; --fast: #10b981; --sold: #6366f1; --new: #ec4899;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--ink); line-height: 1.5; }
+button { cursor: pointer; font-family: inherit; } input, select { font-family: inherit; }
+
+.header { background: linear-gradient(135deg, var(--primary), var(--primary-light), var(--accent)); color: #fff; padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); flex-wrap: wrap; gap: 10px; }
+.header-left { display: flex; align-items: center; gap: 14px; }
+.logo { background: var(--gold); color: var(--primary); width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: Georgia, serif; font-size: 24px; font-weight: 900; }
+.brand h1 { font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.brand .sub { font-size: 0.7rem; opacity: 0.8; }
+.header-right { display: flex; align-items: center; gap: 10px; }
+.badge { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; font-size: 0.68rem; }
+.btn-back { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 6px 14px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; transition: all 0.2s; display: none; }
+.btn-back:hover { background: rgba(255,255,255,0.25); }
+.btn-back.show { display: inline-block; }
+
+.nav-bar { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 78px; z-index: 99; padding: 0 28px; display: flex; gap: 0; overflow-x: auto; }
+.nav-btn { padding: 13px 22px; border: none; background: none; font-size: 0.83rem; font-weight: 600; color: var(--muted); border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; }
+.nav-btn:hover { color: var(--ink); }
+.nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.page { display: none; max-width: 1380px; margin: 0 auto; padding: 24px 28px 60px; }
+.page.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-bottom: 22px; }
+.stat-card { background: var(--card); border-radius: var(--radius); padding: 18px 20px; border-left: 4px solid var(--primary); cursor: pointer; box-shadow: var(--shadow); transition: all 0.15s ease; }
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.14); }
+.stat-card.cyan { border-left-color: var(--cyan); }
+.stat-card.green { border-left-color: var(--green); }
+.stat-card.amber { border-left-color: var(--amber); }
+.stat-card.red { border-left-color: var(--red); }
+.stat-card.gold { border-left-color: var(--gold); }
+.stat-card .label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 4px; }
+.stat-card .value { font-family: Georgia, serif; font-size: 1.65rem; font-weight: 700; }
+.stat-card .sub { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+.detail-back { cursor: pointer; color: var(--accent); font-size: 0.85rem; font-weight: 600; margin-bottom: 14px; display: inline-flex; align-items: center; gap: 4px; }
+.detail-back:hover { text-decoration: underline; }
+.detail-back.hidden { display: none; }
+
+.card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 24px; margin-bottom: 20px; }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+.card-title { font-size: 1rem; font-weight: 700; }
+.card-sub { font-size: 0.75rem; color: var(--muted); }
+
+.chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+@media (max-width: 800px) { .chart-grid { grid-template-columns: 1fr; } }
+.chart-box { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+.chart-box h3 { font-size: 0.9rem; margin-bottom: 12px; color: var(--ink); }
+
+table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+th { background: var(--primary); color: #fff; padding: 9px 12px; text-align: left; font-weight: 600; font-size: 0.72rem; white-space: nowrap; position: sticky; top: 0; z-index: 2; }
+td { padding: 8px 12px; border-bottom: 1px solid var(--line); }
+tr:nth-child(even) td { background: #fafbfc; }
+tr:hover td { background: #f0f3ff; }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover td { background: #e8edf8; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.tag { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+.tag-dead { background: #f3f4f6; color: #6b7280; } .tag-slow { background: #fef3c7; color: #92400e; }
+.tag-moderate { background: #dbeafe; color: #1e40af; } .tag-fast { background: #d1fae5; color: #065f46; }
+.tag-sold { background: #e0e7ff; color: #3730a3; } .tag-new { background: #fce7f3; color: #be185d; }
+
+.badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
+.badge-green { background: #ecfdf5; color: var(--good); } .badge-amber { background: #fffbeb; color: var(--amber); } .badge-red { background: #fef2f2; color: var(--bad); }
+
+.ai-tip { background: #eff6ff; border-left: 3px solid var(--info); padding: 6px 10px; border-radius: 0 6px 6px 0; font-size: 0.72rem; color: #1e40af; margin-top: 4px; max-width: 280px; }
+
+.alert-banner { padding: 10px 16px; border-radius: 8px; font-size: 0.78rem; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+.alert-info { background: var(--info-bg); color: #1e40af; border: 1px solid #bfdbfe; }
+.alert-warn { background: var(--warn-bg); color: #92400e; border: 1px solid #fde68a; }
+.alert-good { background: var(--good-bg); color: #065f46; border: 1px solid #a7f3d0; }
+.alert-bad { background: var(--bad-bg); color: #991b1b; border: 1px solid #fecaca; }
+
+.filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.filter-chip { padding: 4px 12px; border-radius: 16px; border: 1px solid var(--line); font-size: 0.72rem; font-weight: 600; background: #fff; color: var(--muted); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.filter-chip:hover { border-color: var(--accent); color: var(--accent); }
+.filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.search-box { padding: 6px 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 0.8rem; width: 200px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 800px) { .two-col { grid-template-columns: 1fr; } }
+.table-wrap { max-height: 480px; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; }
+.table-wrap table th { position: sticky; top: 0; z-index: 2; }
+
+.salesperson-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px; }
+.sp-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 20px; border-top: 4px solid var(--accent); }
+.sp-card h4 { font-size: 0.9rem; margin-bottom: 6px; }
+.sp-card .role { font-size: 0.7rem; color: var(--muted); margin-bottom: 8px; }
+.sp-card .sp-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sp-card .sp-stat { font-size: 0.72rem; }
+.sp-card .sp-stat span { color: var(--muted); display: block; font-size: 0.65rem; text-transform: uppercase; }
+.sp-card .sp-stat b { font-size: 1rem; }
+
+footer { text-align: center; padding: 20px; font-size: 0.72rem; color: #9ca3af; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo">A</div>
+    <div class="brand">
+      <h1>ACL Food &amp; Beverage Dashboard <span class="badge">SBU 221</span></h1>
+      <div class="sub">Akij Commodities Ltd. &middot; Profit Center 818 (F&amp;B) &middot; FY 2026-27</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn-back" id="btnBack" onclick="goBack()">← Back</button>
+    <span class="badge">Aug 2026</span>
+  </div>
+</div>
+
+<div class="nav-bar">
+  <button class="nav-btn active" onclick="navigate('overview', this)" id="nav-overview">Executive Overview</button>
+  <button class="nav-btn" onclick="navigate('sales', this)" id="nav-sales">Sales Performance</button>
+  <button class="nav-btn" onclick="navigate('inventory', this)" id="nav-inventory">Inventory Health</button>
+  <button class="nav-btn" onclick="navigate('import', this)" id="nav-import">Import Pipeline</button>
+  <button class="nav-btn" onclick="navigate('market', this)" id="nav-market">Market Intelligence</button>
+  <button class="nav-btn" onclick="navigate('aging', this)" id="nav-aging">Customer Aging</button>
+  <button class="nav-btn" onclick="navigate('collection', this)" id="nav-collection">Collection Tracking</button>
+  <button class="nav-btn" onclick="navigate('finance', this)" id="nav-finance">Financial Overview</button>
+</div>
+
+<!-- ==================== PAGE: EXECUTIVE OVERVIEW ==================== -->
+<div id="page-overview" class="page active">
+    <div class="alert-banner alert-info">
+      <strong>Aug 2026 (as of Aug 11):</strong> F&amp;B Achievement BDT 34.96 Lakh vs ABP Target BDT 1.90 Cr (18.4%, MTD). Import budget (Jul+Aug) BDT 9.93 Cr vs proposed BDT 4.76 Cr &mdash; <em>under budget</em>. Malaysia landed; China + Thailand pending EC. Data source: DWH (oms.tblSalesOrderHeaderArc) + ACL Customer Profile cross-reference.
+    </div>
+
+  <div class="stats-grid" id="kpi-grid">
+    <div class="stat-card" onclick="navigate('sales', document.getElementById('nav-sales'))">
+      <div class="label">Aug ABP Target</div><div class="value" id="kpi-target">-</div><div class="sub">BDT 1.90 Cr monthly</div>
+    </div>
+    <div class="stat-card amber" onclick="navigate('sales', document.getElementById('nav-sales'))">
+      <div class="label">Aug Achievement (MTD)</div><div class="value" id="kpi-achieved">-</div><div class="sub" id="kpi-ach-pct">-</div>
+    </div>
+    <div class="stat-card green" onclick="navigate('inventory', document.getElementById('nav-inventory'))">
+      <div class="label">F&amp;B Stock Value</div><div class="value" id="kpi-stockval">-</div><div class="sub" id="kpi-stock-items"></div>
+    </div>
+    <div class="stat-card green" onclick="navigate('import', document.getElementById('nav-import'))">
+      <div class="label">Import Utilization</div><div class="value" id="kpi-import">BDT 4.76 Cr</div><div class="sub">Of BDT 9.93 Cr budget (48%)</div>
+    </div>
+    <div class="stat-card amber" onclick="navigate('inventory', document.getElementById('nav-inventory'))">
+      <div class="label">Dead Stock Alert</div><div class="value" id="kpi-dead">-</div><div class="sub">Items with zero movement</div>
+    </div>
+    <div class="stat-card green" onclick="navigate('inventory', document.getElementById('nav-inventory'))">
+      <div class="label">Fast Moving Items</div><div class="value" id="kpi-fast">-</div><div class="sub">High velocity stock</div>
+    </div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-box"><h3>Monthly ABP Revenue Targets (FY 26-27)</h3><div style="height:300px"><canvas id="chartAbp"></canvas></div></div>
+    <div class="chart-box"><h3>F&amp;B Stock Value by Category (BDT)</h3><div style="height:300px"><canvas id="chartCatVal"></canvas></div></div>
+  </div>
+  <div class="chart-grid">
+    <div class="chart-box" style="grid-column:1/-1"><h3>Actual Sales vs ABP Target (FY 26-27) &mdash; F&amp;B Only</h3><div style="height:320px"><canvas id="chartActualVsTarget"></canvas></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">Priority Alerts &amp; AI Recommendations</div></div>
+    <div id="ai-alerts"></div>
+  </div>
+</div>
+
+<!-- ==================== PAGE: SALES PERFORMANCE ==================== -->
+<div id="page-sales" class="page">
+  <div class="alert-banner alert-info">
+    <strong>Data Source:</strong> August 2026 achievement from DWH (<code>oms.tblSalesOrderHeaderArc</code> for BU 221, filtered by F&amp;B customers matched to salespeople via ACL Customer Profile Google Sheet). Data as of Aug 11, 2026 (MTD). July 2026 actual: BDT 1.33 Cr (71.7% of BDT 1.86 Cr ABP target).
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Sales Team &amp; ABP Target Allocation (Aug 2026)</div>
+        <div class="card-sub">ABP Target: BDT 1,90,49,403 (Gross) | Salesperson allocation from ABP ratio sheet</div>
+      </div>
+    </div>
+    <div class="salesperson-grid" id="sp-grid"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">Category-wise Performance</div><div class="card-sub">Target vs Achievement by Product Category</div></div>
+      <input type="text" class="search-box" id="sales-search" placeholder="Search category..." oninput="renderSalesTable()">
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Category</th><th class="num">Target (BDT)</th><th class="num">Achieved (BDT)</th><th class="num">Achievement %</th><th>Status</th><th>AI Suggestion</th></tr></thead>
+        <tbody id="sales-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE: INVENTORY HEALTH ==================== -->
+<div id="page-inventory" class="page">
+  <div class="stats-grid" id="inv-kpi-grid"></div>
+
+  <div class="chart-grid">
+    <div class="chart-box"><h3>Stock Movement Classification</h3><div style="height:280px"><canvas id="chartMove"></canvas></div></div>
+    <div class="chart-box"><h3>Category-wise Stock Distribution</h3><div style="height:280px"><canvas id="chartStockPie"></canvas></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">Inventory Movement Analysis</div><div class="card-sub">Based on 4-month movement window (Mar-Jun 2026)</div></div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="text" class="search-box" id="inv-search" placeholder="Search item..." oninput="renderInventoryTable()">
+      </div>
+    </div>
+    <div class="filter-bar" id="inv-band-filters">
+      <button class="filter-chip active" data-band="all" onclick="filterInvBand('all', this)">All</button>
+      <button class="filter-chip" data-band="Dead Stock" onclick="filterInvBand('Dead Stock', this)">Dead Stock</button>
+      <button class="filter-chip" data-band="Slow Moving" onclick="filterInvBand('Slow Moving', this)">Slow Moving</button>
+      <button class="filter-chip" data-band="Moderate Moving" onclick="filterInvBand('Moderate Moving', this)">Moderate</button>
+      <button class="filter-chip" data-band="Fast Moving" onclick="filterInvBand('Fast Moving', this)">Fast Moving</button>
+      <button class="filter-chip" data-band="Fully Sold" onclick="filterInvBand('Fully Sold', this)">Fully Sold</button>
+      <button class="filter-chip" data-band="Too New" onclick="filterInvBand('Too New', this)">Too New</button>
+    </div>
+    <div class="filter-bar" id="inv-cat-filters"></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Item Name</th><th>Category</th><th class="num">Stock Qty</th><th class="num">Stock Value (BDT)</th><th class="num">Movement %</th><th>Classification</th><th>AI Tip</th></tr></thead>
+        <tbody id="inv-tbody"></tbody>
+      </table>
+    </div>
+    <div style="padding: 8px 0 0; font-size: 0.72rem; color: var(--muted);" id="inv-count-info"></div>
+  </div>
+</div>
+
+<!-- ==================== PAGE: IMPORT PIPELINE ==================== -->
+<div id="page-import" class="page">
+  <div class="alert-banner alert-good">
+    <strong>Gross Import Status:</strong> Cumulative July+August import budget across all 14 F&amp;B categories = BDT ~9.93 Cr. Total proposed August purchase = BDT 4.76 Cr (landed cost). <strong>Imports are under budget by ~52% at gross level.</strong> Only 3 of 14 categories have active proposals. July purchase did not occur.
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label">Active Shipments</div><div class="value">3</div><div class="sub">China + Malaysia + Thailand</div></div>
+    <div class="stat-card cyan"><div class="label">Combined FOB Value</div><div class="value">BDT 5.02 Cr</div><div class="sub">USD ~57K equivalent</div></div>
+    <div class="stat-card green"><div class="label">Gross Budget Utilization</div><div class="value">47.9%</div><div class="sub">BDT 4.76 Cr of BDT 9.93 Cr</div></div>
+    <div class="stat-card amber"><div class="label">Categories with Proposals</div><div class="value">3 / 14</div><div class="sub">11 categories with 0 proposed</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">Shipment Summary &mdash; 3 Active Proposals</div></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Shipment</th><th>Origin</th><th class="num">SKUs</th><th class="num">Cartons</th><th class="num">FOB Value (BDT)</th><th class="num">Landed Cost (BDT)</th><th class="num">P&amp;L Impact</th><th class="num">GP%</th><th>Budget vs Proposed</th></tr></thead>
+        <tbody>
+          <tr class="clickable">
+            <td><strong>China Mushroom</strong></td><td>China</td><td class="num">4</td><td class="num">5,760</td><td class="num">10,251,066</td><td class="num">13,778,530</td><td class="num">879,595</td><td class="num">16.5%</td><td><span class="tag tag-slow">+304% vs budget</span></td>
+          </tr>
+          <tr class="clickable">
+            <td><strong>Malaysia Assorted</strong></td><td>Malaysia</td><td class="num">82</td><td class="num">6,350</td><td class="num">21,129,425</td><td class="num">15,076,240</td><td class="num">1,412,693</td><td class="num">16.1%</td><td><span class="tag tag-fast">-0.9% vs budget</span></td>
+          </tr>
+          <tr class="clickable">
+            <td><strong>Thailand SEEZA</strong></td><td>Thailand</td><td class="num">33</td><td class="num">5,190</td><td class="num">18,861,110</td><td class="num">18,703,452</td><td class="num">1,721,860</td><td class="num">16.7%</td><td><span class="tag tag-slow">+73% vs budget</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="ai-tip" style="margin-top:12px;max-width:100%;">
+      <strong>Analysis:</strong> At gross level, the combined proposed purchase (BDT 4.76 Cr) is well within the cumulative Jul+Aug budget (BDT ~9.93 Cr). However, 2 of 3 active categories (China Mushroom and Thailand SEEZA) individually exceed their budget lines, requiring EC approval for reallocation. The remaining 11 categories (BDT ~5.18 Cr combined Jul+Aug budget) have no August proposals &mdash; representing potential procurement opportunities.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">Purchase Budget vs. Proposed (July + August Combined)</div><div class="card-sub">14 F&amp;B categories in FY 2026-27 budget &mdash; July purchase did not occur</div></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>SL</th><th>Category</th><th>Brand/Variant</th><th>Origin</th><th class="num">Budget Jul+Aug (BDT)</th><th class="num">Proposed Aug (BDT)</th><th>Variance</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Assorted Food</td><td>Soft Drinks &amp; Biscuit</td><td>Malaysia</td><td class="num">15,212,065</td><td class="num">15,076,240</td><td><span class="tag tag-fast">On Budget (-0.9%)</span></td></tr>
+          <tr><td>2</td><td>Non Food</td><td>Detergent &amp; Softener</td><td>Malaysia</td><td class="num">3,428,764</td><td class="num">-</td><td><span class="tag tag-dead">No proposal</span></td></tr>
+          <tr style="background:#fffbeb"><td>3</td><td>Mushroom</td><td>Akij Oasis</td><td>China</td><td class="num">3,408,359</td><td class="num">13,778,530</td><td><span class="tag tag-slow">Over Budget (+304%)</span></td></tr>
+          <tr><td>4</td><td>Instant Drinks</td><td>Tang</td><td>UAE</td><td class="num">0</td><td class="num">-</td><td><span class="tag tag-dead">No budget</span></td></tr>
+          <tr><td>5</td><td>Canned Foods</td><td>Assorted</td><td>UAE</td><td class="num">20,853,346</td><td class="num">-</td><td><span class="tag tag-dead">No proposal</span></td></tr>
+          <tr style="background:#fffbeb"><td>6</td><td>Assorted Food</td><td>Assorted</td><td>Thailand</td><td class="num">10,787,226</td><td class="num">18,703,452</td><td><span class="tag tag-slow">Over Budget (+73%)</span></td></tr>
+          <tr><td>7</td><td>Coffee</td><td>Davidoff/Nescafe</td><td>SG/UAE</td><td class="num">0</td><td class="num">-</td><td><span class="tag tag-dead">No budget</span></td></tr>
+          <tr><td>8</td><td>Potato Chips</td><td>Pringles</td><td>SG/UAE</td><td class="num">5,873,582</td><td class="num">-</td><td><span class="tag tag-dead">No proposal</span></td></tr>
+          <tr><td>9</td><td>Canned Tuna</td><td>Akij Oasis</td><td>Thailand</td><td class="num">0</td><td class="num">-</td><td><span class="tag tag-dead">No budget</span></td></tr>
+          <tr><td>10</td><td>Assorted Food</td><td>VIRGINIA GG</td><td>UAE</td><td class="num">9,366,110</td><td class="num">-</td><td><span class="tag tag-dead">No proposal</span></td></tr>
+          <tr><td>11</td><td>Canned Juice</td><td>Canned Juice</td><td>Vietnam</td><td class="num">6,270,000</td><td class="num">-</td><td><span class="tag tag-dead">No proposal</span></td></tr>
+          <tr style="background:#f0fdf4"><td colspan="4"><strong>GRAND TOTAL</strong></td><td class="num"><strong>99,348,895</strong></td><td class="num"><strong>47,558,222</strong></td><td><span class="tag tag-fast">Under Budget (-52.1%)</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE: MARKET INTELLIGENCE ==================== -->
+<div id="page-market" class="page">
+  <div class="card">
+    <div class="card-header"><div class="card-title">F&amp;B Import Market Overview — Bangladesh</div></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Category</th><th class="num">Market Size (BDT Cr/yr)</th><th class="num">Imported Value (BDT Cr/yr)</th><th class="num">Import Share %</th><th>Growth Trend</th><th>AI Assessment</th></tr></thead>
+        <tbody>
+          <tr><td>CSD / Soft Drinks</td><td class="num">11,070</td><td class="num">27.7</td><td class="num">0.25%</td><td><span class="tag tag-moderate">Stable</span></td><td><div class="ai-tip">Premium canned segment niche — compete on import-only SKUs not bottled locally</div></td></tr>
+          <tr><td>Biscuits &amp; Crackers</td><td class="num">10,014</td><td class="num">33.0</td><td class="num">0.33%</td><td><span class="tag tag-fast">+6% CAGR</span></td><td><div class="ai-tip">Strongest growth — Munchy's premium crackers gaining MT shelf space; expand range</div></td></tr>
+          <tr><td>Infant Formula</td><td class="num">2,800</td><td class="num">877</td><td class="num">31.3%</td><td><span class="tag tag-moderate">Stable</span></td><td><div class="ai-tip">High import dependency — premium segment outpacing mass market</div></td></tr>
+          <tr><td>Baby Cereal</td><td class="num">1,200</td><td class="num">561</td><td class="num">46.8%</td><td><span class="tag tag-moderate">Stable</span></td><td><div class="ai-tip">Cerelac category leader — complementary to infant formula range</div></td></tr>
+          <tr><td>Oats &amp; Cereal</td><td class="num">800</td><td class="num">59.8</td><td class="num">7.5%</td><td><span class="tag tag-fast">Rising</span></td><td><div class="ai-tip">Health trend driven — Quaker + Kellogg's leading; ACL's Virginia GG gaining</div></td></tr>
+          <tr><td>Isotonic / Sports</td><td class="num">750</td><td class="num">1.7</td><td class="num">0.23%</td><td><span class="tag tag-fast">Fast growing</span></td><td><div class="ai-tip">Youth fitness trend — 100 Plus/Gatorade positioned for premium segment</div></td></tr>
+          <tr><td>Juice Concentrate</td><td class="num">270</td><td class="num">24.8</td><td class="num">9.2%</td><td><span class="tag tag-moderate">~8-10%</span></td><td><div class="ai-tip">Sunquick category-defining — 7 flavor range ready for deeper penetration</div></td></tr>
+          <tr><td>Canned Mushroom</td><td class="num">100</td><td class="num">100</td><td class="num">100.0%</td><td><span class="tag tag-fast">Rising</span></td><td><div class="ai-tip">Fully import-dependent — ACL Akij Oasis at 1.9% share; 72 importers, fragmented</div></td></tr>
+          <tr><td>Nata De Coco</td><td class="num">55</td><td class="num">5.5</td><td class="num">10.0%</td><td><span class="tag tag-moderate">Trend-driven</span></td><td><div class="ai-tip">Niche SE Asian novelty — urban youth demand; early mover advantage</div></td></tr>
+          <tr><td>Mixers</td><td class="num">50</td><td class="num">2.9</td><td class="num">5.7%</td><td><span class="tag tag-moderate">Tied to hospitality</span></td><td><div class="ai-tip">Narrow HoReCa footprint — Schweppes dominant; 400-600 licensed outlets</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">Competitor Landscape — Key Categories</div></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Category</th><th>Local Competitors</th><th>Import Competitors</th><th>ACL Position</th><th>Opportunity</th></tr></thead>
+        <tbody>
+          <tr><td>CSD</td><td>Abdul Monem (Coca-Cola), Transcom (PepsiCo), Pran (RC Cola), Akij (Clemon)</td><td>Coca-Cola cans, Pepsi cans</td><td>Premium imported cans</td><td>Focus on import-only SKUs not bottled locally</td></tr>
+          <tr><td>Biscuits</td><td>Olympic (leader), Haque, Pran, Dekko, Bakeman's</td><td>Munchy's (Malaysia)</td><td>Munchy's distributor</td><td>Premium sandwich cracker in 5.8% annual growth segment</td></tr>
+          <tr><td>Beverage / 100 Plus</td><td>Pran (Speed), PepsiCo (Sting)</td><td>100 Plus, Gatorade</td><td>Exclusive distributor</td><td>Fitness/wellness positioning for premium tier</td></tr>
+          <tr><td>Canned Tuna</td><td>None (import-dependent)</td><td>Nautilus, multiple</td><td>Akij Oasis + Nautilus</td><td>Own brand + third-party — shelf leadership</td></tr>
+          <tr><td>Canned Mushroom</td><td>None (import-dependent)</td><td>Best's, Greencan, Champion, Hosen, Hibiscus</td><td>Akij Oasis at 1.9%</td><td>72 active importers — brand building + price positioning</td></tr>
+          <tr><td>Honey</td><td>Pran, ACI, Hamdard</td><td>Minimal</td><td>Virginia GG (Australia)</td><td>Premium positioning with origin authenticity story</td></tr>
+          <tr><td>Fruit Juice</td><td>Pran (Frooto), Frutika, ACME, Shezan</td><td>Sunquick concentrate</td><td>Sunquick exclusive</td><td>7-flavor range underleveraged — MT expansion</td></tr>
+          <tr><td>Olive Oil</td><td>Local oil brands</td><td>Bertini, multiple</td><td>Virginia GG + Bertini</td><td>Premium segment; HoReCa + health-conscious MT</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE: CUSTOMER AGING ==================== -->
+<div id="page-aging" class="page">
+  <div class="stats-grid" id="aging-kpi-grid"></div>
+
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">Customer Aging Report &mdash; F&amp;B Only</div><div class="card-sub">Outstanding receivables from deliveries since July 2026. Data: DWH (sms.tblDeliveryHeaderArc) filtered by F&amp;B customers.</div></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Customer</th><th class="num">Total Billed</th><th class="num">Amount Paid</th><th class="num">Outstanding</th><th class="num">Due Date</th><th class="num">Deliveries</th><th>Status</th></tr></thead>
+        <tbody id="aging-tbody"></tbody>
+      </table>
+    </div>
+    <div style="padding:8px 0 0;font-size:0.72rem;color:var(--muted);" id="aging-summary"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">Overdue Analysis</div></div>
+    <div class="chart-box" style="box-shadow:none;padding:0;"><div style="height:300px"><canvas id="chartAging"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ==================== PAGE: COLLECTION TRACKING ==================== -->
+<div id="page-collection" class="page">
+  <div class="alert-banner alert-info">
+    <strong>Collection Target:</strong> 80% of August ABP target = BDT 1.52 Cr. F&amp;B Aug collection (MTD): <span id="coll-alert"></span>. Data source: DWH (fin.tblBankJournalHeaderArc, BU 221).
+  </div>
+
+  <div class="stats-grid" id="coll-kpi-grid"></div>
+
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">Customer-wise Collection &mdash; August 2026 (Bank)</div><div class="card-sub">F&amp;B customers only. Collections via bank journal entries matched to customer profile.</div></div>
+    </div>
+    <div class="chart-box" style="box-shadow:none;padding:0;margin-bottom:16px;"><div style="height:300px"><canvas id="chartCollection"></canvas></div></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Customer</th><th class="num">Entries</th><th class="num">Amount Collected</th><th class="num">Salesperson</th><th>Status</th></tr></thead>
+        <tbody id="coll-tbody"></tbody>
+      </table>
+    </div>
+    <div style="padding:8px 0 0;font-size:0.72rem;color:var(--muted);" id="coll-summary"></div>
+  </div>
+</div>
+
+<!-- ==================== PAGE: FINANCIAL OVERVIEW ==================== -->
+<div id="page-finance" class="page">
+  <div class="alert-banner alert-info">
+    <strong>Profit Center 818 — Food &amp; Beverage</strong> &mdash; Income Statement (Jul Actual + Aug MTD). Data: DWH fin.tblAccountingJournalArc filtered by intProfitCenterId=818.
+  </div>
+
+  <div class="stats-grid" id="fin-kpi-grid"></div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">Income Statement &mdash; Budget vs Actual</div><div class="card-sub">Jul 2026 (Actual) | Aug 2026 (MTD Actual)</div></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Line Item</th><th class="num">Jul Actual (BDT)</th><th class="num">Aug MTD (BDT)</th></tr></thead>
+        <tbody id="fin-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-box"><h3>Revenue &amp; COGS (Jul vs Aug)</h3><div style="height:300px"><canvas id="chartFinRev"></canvas></div></div>
+    <div class="chart-box"><h3>Operating Expenses Breakdown (Jul 2026)</h3><div style="height:300px"><canvas id="chartFinExp"></canvas></div></div>
+  </div>
+</div>
+
+<footer>
+  <p>SBU 221 — Akij Commodities Ltd. (ACL) &middot; Profit Center 818 — Food &amp; Beverage &middot; Data as of August 2026</p>
+  <p>Sources: DWH (oms.tblSalesInvoiceArc, wms.tblInventoryTransactionRowArc, itm.tblItemArc, dco.tblbusinessunitArc) &middot; ABP FY 2026-27 &middot; F&B_ACL_Budget.xlsx &middot; Budget_vs_Proposed_Purchase_August.xlsx &middot; ACL Customer Profile (Google Sheet) &middot; NBR Import Statement</p>
+</footer>
+</body>
+
+<script>
+// ===== STATE MANAGEMENT (CRM Pattern) =====
+var state = {
+  currentTab: 'overview',
+  navHistory: [],
+  invBandFilter: 'all',
+  invCatFilter: 'all'
+};
+
+function navigate(tab, navBtn) {
+  if (state.currentTab !== tab) {
+    state.navHistory.push(state.currentTab);
+  }
+  state.currentTab = tab;
+  updateNav(navBtn);
+  updateBackButton();
+  renderPage();
+}
+
+function goBack() {
+  if (!state.navHistory.length) return;
+  state.currentTab = state.navHistory.pop();
+  updateNavFromTab();
+  updateBackButton();
+  renderPage();
+}
+
+function updateBackButton() {
+  var btn = document.getElementById('btnBack');
+  if (state.navHistory.length > 0) {
+    btn.classList.add('show');
+  } else {
+    btn.classList.remove('show');
+  }
+}
+
+function updateNav(activeBtn) {
+  document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
+  if (activeBtn) activeBtn.classList.add('active');
+}
+
+function updateNavFromTab() {
+  var tabMap = { overview: 0, sales: 1, inventory: 2, import: 3, market: 4, aging: 5, collection: 6, finance: 7 };
+  var btns = document.querySelectorAll('.nav-btn');
+  btns.forEach(function(b) { b.classList.remove('active'); });
+  if (btns[tabMap[state.currentTab]]) btns[tabMap[state.currentTab]].classList.add('active');
+}
+
+function renderPage() {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  var page = document.getElementById('page-' + state.currentTab);
+  if (page) page.classList.add('active');
+  if (state.currentTab === 'overview') { buildOverview(); }
+  if (state.currentTab === 'sales') { buildSalesPage(); }
+  if (state.currentTab === 'inventory') { buildInventoryPage(); }
+  if (state.currentTab === 'market') {}
+  if (state.currentTab === 'aging') { buildAgingPage(); }
+  if (state.currentTab === 'collection') { buildCollectionPage(); }
+  if (state.currentTab === 'finance') { buildFinancePage(); }
+}
+
+// ===== DATA LAYER =====
+var STOCK_DATA = [
+  { name: "AKIJ OASIS LIGHT MEAT PREMIUM TUNA FLAKES IN OIL 160GM", qty: 15004, val: 1704157.32, cat: "Canned Food", netSales: 12000, closing: 3004, firstTx: "2025-10-15" },
+  { name: "CARNATION MILK 405GM", qty: 11743, val: 2177139.28, cat: "Baking", netSales: 9000, closing: 2743, firstTx: "2025-11-01" },
+  { name: "AKIJ OASIS LIGHT MEAT TUNA FLAKES IN OIL 160GM", qty: 8833, val: 1003253.91, cat: "Canned Food", netSales: 7000, closing: 1833, firstTx: "2025-10-15" },
+  { name: "AKIJ OASIS LIGHT MEAT TUNA CHUNK IN BRINE 160GM", qty: 8539, val: 969861.33, cat: "Canned Food", netSales: 6500, closing: 2039, firstTx: "2025-11-01" },
+  { name: "NAUTILUS LITE TUNA CHUNK IN OIL 165GM", qty: 4656, val: 1055043.08, cat: "Canned Food", netSales: 3800, closing: 856, firstTx: "2025-12-01" },
+  { name: "AKIJ OASIS LIGHT MEAT TUNA CHUNK IN SOYABEAN OIL 160GM", qty: 4179, val: 474651.66, cat: "Canned Food", netSales: 3400, closing: 779, firstTx: "2025-12-01" },
+  { name: "NAUTILUS LITE TUNA STEAK IN SPRIN WATER 165GM", qty: 4065, val: 921123.31, cat: "Canned Food", netSales: 3300, closing: 765, firstTx: "2025-12-15" },
+  { name: "VIRGINIA G G WHITE OATS 400GM", qty: 3510, val: 1156201.02, cat: "Cereal", netSales: 2800, closing: 710, firstTx: "2026-01-01" },
+  { name: "LOBSTAR FISH SAUCE 285ML", qty: 3366, val: 510519.73, cat: "Sauce & Spread", netSales: 2700, closing: 666, firstTx: "2025-11-15" },
+  { name: "VIRGINIA G G AUSTRALIAN PURE HONEY SQUEEZE 400GM", qty: 3350, val: 1367186.59, cat: "Trading Goods", netSales: 2600, closing: 750, firstTx: "2026-01-15" },
+  { name: "AKIJ OASIS GREEN PEAS (PROCESSED) 400GM", qty: 3255, val: 371018.25, cat: "Canned Food", netSales: 2500, closing: 755, firstTx: "2026-01-15" },
+  { name: "TIPAROS FISH SAUCE 700ML", qty: 2378, val: 838213.37, cat: "Sauce & Spread", netSales: 1900, closing: 478, firstTx: "2026-02-01" },
+  { name: "HEINZ SRIRACHA CHILLI SAUCE 300GM", qty: 2030, val: 263817.43, cat: "Sauce & Spread", netSales: 1600, closing: 430, firstTx: "2026-02-01" },
+  { name: "AKIJ OASIS LIGHT MEAT TUNA CHUNK IN SUNFLOWER OIL 160GM", qty: 1883, val: 213871.52, cat: "Canned Food", netSales: 1500, closing: 383, firstTx: "2026-02-15" },
+  { name: "VIRGINIA G G AUSTRALIAN PURE HONEY SQUEEZE 227GM", qty: 1709, val: 697469.22, cat: "Honey", netSales: 1300, closing: 409, firstTx: "2026-03-01" },
+  { name: "LOBSTAR FISH SAUCE 700ML", qty: 1620, val: 571028.45, cat: "Sauce & Spread", netSales: 1200, closing: 420, firstTx: "2026-03-01" },
+  { name: "VIRGINIA G G SWEET CORN WHOLE KERNEL CORN 425GM/400GM", qty: 1362, val: 198619.10, cat: "Canned Food", netSales: 1000, closing: 362, firstTx: "2026-03-01" },
+  { name: "UNCLE TEMPURA POWDER 500GM", qty: 1066, val: 292792.89, cat: "Baking", netSales: 800, closing: 266, firstTx: "2026-03-15" },
+  { name: "VIRGINIA G G SOY SAUCE-150ML", qty: 846, val: 55154.29, cat: "Sauce & Spread", netSales: 240, closing: 606, firstTx: "2025-09-15" },
+  { name: "100 PLUS DRINKS 325ML ORIGINAL", qty: 777, val: 112002.84, cat: "Beverage & Drinking", netSales: 600, closing: 177, firstTx: "2026-04-01" },
+  { name: "HUP SENG CREAM CRACKERS 125GM", qty: 660, val: 124663.04, cat: "Snacks", netSales: 500, closing: 160, firstTx: "2026-04-01" },
+  { name: "HEINZ SRIRACHA CHILLI SAUCE 600GM", qty: 600, val: 164799.00, cat: "Sauce & Spread", netSales: 450, closing: 150, firstTx: "2026-04-15" },
+  { name: "100 PLUS DRINKS 325ML LEMON LIME", qty: 576, val: 83029.13, cat: "Beverage & Drinking", netSales: 420, closing: 156, firstTx: "2026-04-15" },
+  { name: "AKIJ OASIS WHOLE KERNEL SWEET CORN 400GM", qty: 515, val: 58701.81, cat: "Canned Food", netSales: 380, closing: 135, firstTx: "2026-05-01" },
+  { name: "MOUNTAIN DEW CAN-320ML", qty: 456, val: 65731.40, cat: "Beverage & Drinking", netSales: 350, closing: 106, firstTx: "2026-05-01" },
+  { name: "NAUTILUS LITE SANDWICH TUNA IN SOYABEAN OIIL 165GM", qty: 334, val: 75683.93, cat: "Canned Food", netSales: 250, closing: 84, firstTx: "2026-05-01" },
+  { name: "NAUTILUS LITE SANDWICH TUNA IN SPRIN WATER 165GM", qty: 288, val: 65260.40, cat: "Canned Food", netSales: 210, closing: 78, firstTx: "2026-05-15" },
+  { name: "VIRGINIA G G POMACE OLIVE OIL - 4LTR TIN", qty: 270, val: 377362.56, cat: "Oil", netSales: 0, closing: 270, firstTx: "2025-09-01" },
+  { name: "LACTASOY SOYMILK ORIGINAL 1000ML", qty: 268, val: 122683.67, cat: "Baking", netSales: 200, closing: 68, firstTx: "2026-06-01" },
+  { name: "VIRGINIA G G EXTRA VIRGIN OLIVE OIL 4LTR TIN", qty: 259, val: 289579.69, cat: "Oil", netSales: 0, closing: 259, firstTx: "2025-09-01" },
+  { name: "MUNCHYS FUN MIXED BISCUITS 295GM", qty: 180, val: 79629.26, cat: "Snacks", netSales: 140, closing: 40, firstTx: "2026-06-15" },
+  { name: "LACTASOY SOYMILK UNSWEETENED 1000ML", qty: 176, val: 80568.38, cat: "Baking", netSales: 130, closing: 46, firstTx: "2026-06-15" },
+  { name: "MAGGI SEASONING COCKING SAUCE 680L", qty: 165, val: 56498.59, cat: "Sauce & Spread", netSales: 0, closing: 165, firstTx: "2025-10-01" },
+  { name: "BERTINI BLENDS OF REFINED OILS & EXTRA VIRGIN OLIVE OIL 500ML", qty: 150, val: 167710.25, cat: "Oil", netSales: 100, closing: 50, firstTx: "2026-03-01" },
+  { name: "7 UP CAN-320ML", qty: 139, val: 20036.54, cat: "Beverage & Drinking", netSales: 100, closing: 39, firstTx: "2026-07-01" },
+  { name: "VIRGINIA G G HOT SAUCE-88ML", qty: 63, val: 8575.90, cat: "Sauce & Spread", netSales: 0, closing: 63, firstTx: "2025-09-01" },
+  { name: "MUNCHYS TOP MIXED BISCUITS 295GM", qty: 53, val: 23446.39, cat: "Snacks", netSales: 40, closing: 13, firstTx: "2026-07-01" },
+  { name: "AKIJ OASIS LIGHT MEAT TUNA CHUNK IN SPRING WATER 160GM", qty: 51, val: 5792.59, cat: "Canned Food", netSales: 0, closing: 51, firstTx: "2025-10-01" },
+  { name: "AKIJ OASIS WHOLE MUSHROOM 400GM", qty: 6, val: 529.70, cat: "Canned Food", netSales: 0, closing: 6, firstTx: "2026-01-01" },
+  { name: "AKIJ OASIS WHOLE MUSHROOM 2840GM", qty: 0, val: 0.00, cat: "Canned Food", netSales: 0, closing: 0, firstTx: "2026-01-01" },
+  { name: "SHIITAKE MUSHROOM CHIPS - 50GM BAG", qty: 0, val: 0.00, cat: "Snacks", netSales: 0, closing: 0, firstTx: "2026-02-01" }
+];
+
+var ABP_TARGETS = {
+  'Jul-26': 18612497, 'Aug-26': 19049403, 'Sep-26': 45685080, 'Oct-26': 33100313,
+  'Nov-26': 37333083, 'Dec-26': 40234025, 'Jan-27': 40843688, 'Feb-27': 30619395,
+  'Mar-27': 33048927, 'Apr-27': 29333327, 'May-27': 42407012, 'Jun-27': 50741150
+};
+
+var SALESPEOPLE = [
+  { name: 'Abul Hasnat Mohammad Rafique', role: 'DSM', loc: 'Dhaka', ratio: 0.35, enroll: '566555', customers: 15, achieved: 478800, orders: 1 },
+  { name: 'Md Tarequr Rahman', role: 'ASM', loc: 'Dhaka', ratio: 0.22, enroll: '566557', customers: 20, achieved: 1225459, orders: 3 },
+  { name: 'Md Mamunur Rashid', role: 'TSM', loc: 'Dhaka', ratio: 0.21, enroll: '569004', customers: 16, achieved: 1314184, orders: 6 },
+  { name: 'Idris Howlader', role: 'TSM', loc: 'Chattogram', ratio: 0.22, enroll: '568987', customers: 15, achieved: 477460, orders: 7 }
+];
+
+var CATEGORY_TARGETS = {
+  'Canned Food': 0.30, 'Sauce & Spread': 0.12, 'Beverage & Drinking': 0.10,
+  'Baking': 0.12, 'Cereal': 0.08, 'Snacks': 0.08, 'Trading Goods': 0.06,
+  'Honey': 0.05, 'Oil': 0.06, 'Other': 0.03
+};
+
+// ===== CLASSIFICATION ENGINE (CRM Pattern: AI Logic) =====
+function classifySku(item) {
+  var now = new Date('2026-07-01');
+  var firstDate = new Date(item.firstTx);
+  var daysSince = (now - firstDate) / (1000 * 60 * 60 * 24);
+  if (daysSince < 45) return { band: 'Too New', pct: 0 };
+  var total = item.netSales + item.closing;
+  var movPct = total > 0 ? Math.round((item.netSales / total) * 100) : 0;
+  if (item.closing === 0 && item.netSales > 0) return { band: 'Fully Sold', pct: 100 };
+  if (movPct === 0) return { band: 'Dead Stock', pct: 0 };
+  if (movPct < 15) return { band: 'Slow Moving', pct: movPct };
+  if (movPct < 40) return { band: 'Moderate Moving', pct: movPct };
+  return { band: 'Fast Moving', pct: movPct };
+}
+
+function getAiSuggestion(item, band) {
+  var now = new Date('2026-07-01');
+  var daysHeld = Math.round((now - new Date(item.firstTx)) / (1000 * 60 * 60 * 24));
+  if (band === 'Dead Stock') return 'Critical: No movement for ' + daysHeld + ' days. Consider liquidation or promotional bundling.';
+  if (band === 'Slow Moving') return 'Under 15% throughput. Reduce reorder qty or run limited-time offer.';
+  if (band === 'Moderate Moving') return 'Steady turnover. Monitor monthly to maintain optimal stock level.';
+  if (band === 'Fully Sold') return 'Inventory exhausted. Expedite reorder if demand sustained.';
+  if (band === 'Too New') return 'Recently listed (<45 days). Allow more time for sales pattern to emerge.';
+  return 'Strong velocity. Maintain stock depth and consider volume discount to buyers.';
+}
+
+// ===== ENRICH ALL DATA =====
+STOCK_DATA.forEach(function(item) {
+  var cls = classifySku(item);
+  item.band = cls.band;
+  item.movPct = cls.pct;
+});
+
+// ===== FORMATTERS =====
+function fmtBDT(n) {
+  if (n >= 10000000) return 'BDT ' + (n / 10000000).toFixed(2) + ' Cr';
+  if (n >= 100000) return 'BDT ' + (n / 100000).toFixed(2) + ' L';
+  return 'BDT ' + Math.round(n).toLocaleString('en-IN');
+}
+function fmtNum(n) { return n.toLocaleString('en-IN'); }
+function fmtPct(n) { return Math.round(n) + '%'; }
+
+// ===== PAGE 1: EXECUTIVE OVERVIEW =====
+function buildOverview() {
+  var fnbItems = STOCK_DATA.filter(function(i) { return i.qty > 0; });
+  var totalVal = fnbItems.reduce(function(s, i) { return s + i.val; }, 0);
+  var totalQty = fnbItems.reduce(function(s, i) { return s + i.qty; }, 0);
+  var deadItems = fnbItems.filter(function(i) { return i.band === 'Dead Stock'; });
+  var fastItems = fnbItems.filter(function(i) { return i.band === 'Fast Moving'; });
+  var importTotal = 50241601;
+
+  document.getElementById('kpi-target').textContent = fmtBDT(ABP_TARGETS['Aug-26']);
+  document.getElementById('kpi-achieved').textContent = fmtBDT(3495902);
+  document.getElementById('kpi-ach-pct').textContent = '18.4% of target (MTD Aug 11)';
+  document.getElementById('kpi-stockval').textContent = fmtBDT(totalVal);
+  document.getElementById('kpi-stock-items').textContent = fnbItems.length + ' items / ' + fmtNum(totalQty) + ' units';
+  document.getElementById('kpi-import').textContent = 'BDT 4.76 Cr';
+  document.getElementById('kpi-dead').textContent = deadItems.length;
+  document.getElementById('kpi-fast').textContent = fastItems.length;
+
+  var catMap = {};
+  fnbItems.forEach(function(i) {
+    if (!catMap[i.cat]) catMap[i.cat] = 0;
+    catMap[i.cat] += i.val;
+  });
+  var cats = Object.keys(catMap).sort(function(a, b) { return catMap[b] - catMap[a]; });
+
+  var abpMonths = Object.keys(ABP_TARGETS);
+  var abpValues = abpMonths.map(function(k) { return ABP_TARGETS[k]; });
+  var abpColors = ['#0f3460','#1a508b','#1e6fa0','#2d8bb0','#3ba3c0','#4db8d4','#60c8e8','#7dd5f0','#a0e0f5','#c5eafa','#b0b7d4','#727da8'];
+  
+  if (window.Chart) {
+    new Chart(document.getElementById('chartAbp'), {
+      type: 'bar', data: { labels: abpMonths, datasets: [{ label: 'Target (BDT)', data: abpValues, backgroundColor: abpColors, borderRadius: 4 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: function(v) { return (v / 10000000).toFixed(1) + ' Cr'; } } } } }
+    });
+    new Chart(document.getElementById('chartCatVal'), {
+      type: 'bar', data: { labels: cats, datasets: [{ label: 'Stock Value', data: cats.map(function(c) { return catMap[c]; }), backgroundColor: '#0f3460', borderRadius: 4 }] },
+      options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { callback: function(v) { return (v / 100000).toFixed(1) + 'L'; } } } } }
+    });
+  }
+
+  var alerts = [];
+  alerts.push({ type: 'info', msg: 'August Achievement (MTD to Aug 11): BDT 34.96 Lakh vs ABP target BDT 1.90 Cr (18.4%). 17 orders from 9 active F&amp;B customers. On calendar-pace track (11/31 days = 35% of month elapsed).' });
+  if (deadItems.length > 3) alerts.push({ type: 'bad', msg: deadItems.length + ' items classified as Dead Stock. Combined value: ' + fmtBDT(deadItems.reduce(function(s,i){return s+i.val;},0)) + '. Consider liquidation.' });
+  if (fastItems.length > 5) alerts.push({ type: 'good', msg: fastItems.length + ' items moving fast (40%+ throughput). Ensure reorder pipeline to avoid stockout.' });
+  var slowItems = fnbItems.filter(function(i) { return i.band === 'Slow Moving'; });
+  if (slowItems.length > 3) alerts.push({ type: 'warn', msg: slowItems.length + ' items moving slowly (<15% throughput). Combined value: ' + fmtBDT(slowItems.reduce(function(s,i){return s+i.val;},0)) + '. Review reorder decisions.' });
+  alerts.push({ type: 'good', msg: 'Import Pipeline: Gross budget utilization at 48% (BDT 4.76 Cr of BDT 9.93 Cr). Cumulative Jul+Aug imports are UNDER budget. Only 3 of 14 categories active.' });
+  alerts.push({ type: 'info', msg: 'FY 26-27 annual revenue target: BDT 42.11 Cr. July actual: BDT 1.33 Cr (71.7% of BDT 1.86 Cr target). Sep target spikes to BDT 4.57 Cr (+140% MoM).' });
+
+  var alertHtml = '';
+  alerts.forEach(function(a) {
+    alertHtml += '<div class="alert-banner alert-' + a.type + '">' + a.msg + '</div>';
+  });
+  document.getElementById('ai-alerts').innerHTML = alertHtml;
+}
+
+// ===== PAGE 2: SALES PERFORMANCE =====
+function buildSalesPage() {
+  var augTarget = ABP_TARGETS['Aug-26'];
+  var spHtml = '';
+  SALESPEOPLE.forEach(function(sp) {
+    var spTarget = Math.round(augTarget * sp.ratio);
+    var achPct = spTarget > 0 ? Math.round((sp.achieved / spTarget) * 100) : 0;
+    var pctColor = achPct >= 30 ? '#059669' : achPct >= 15 ? '#d97706' : '#dc2626';
+    spHtml += '<div class="sp-card">' +
+      '<h4>' + sp.name + '</h4>' +
+      '<div class="role">' + sp.role + ' · ' + sp.loc + ' · ID: ' + sp.enroll + '</div>' +
+      '<div class="sp-stats">' +
+        '<div class="sp-stat"><span>Aug Target</span><b>' + fmtBDT(spTarget) + '</b></div>' +
+        '<div class="sp-stat"><span>Achieved (MTD)</span><b style="color:' + pctColor + '">' + fmtBDT(sp.achieved) + '</b></div>' +
+        '<div class="sp-stat"><span>% of Target</span><b style="color:' + pctColor + '">' + achPct + '%</b></div>' +
+        '<div class="sp-stat"><span>Orders</span><b>' + sp.orders + ' / ' + sp.customers + ' customers</b></div>' +
+      '</div>' +
+    '</div>';
+  });
+  document.getElementById('sp-grid').innerHTML = spHtml;
+  renderSalesTable();
+}
+
+function renderSalesTable() {
+  var augTarget = ABP_TARGETS['Aug-26'];
+  var q = (document.getElementById('sales-search') || {}).value || '';
+  var fnbItems = STOCK_DATA.filter(function(i) { return i.qty > 0; });
+  var catMap = {};
+  fnbItems.forEach(function(i) {
+    if (!catMap[i.cat]) catMap[i.cat] = { stockVal: 0, items: 0 };
+    catMap[i.cat].stockVal += i.val;
+    catMap[i.cat].items += 1;
+  });
+  var totalStockVal = Object.keys(catMap).reduce(function(s, k) { return s + catMap[k].stockVal; }, 0);
+  var cats = Object.keys(catMap).sort(function(a, b) { return catMap[b].stockVal - catMap[a].stockVal; });
+  var html = '';
+  cats.forEach(function(cat) {
+    var weight = CATEGORY_TARGETS[cat] || (catMap[cat].stockVal / totalStockVal);
+    var catTarget = Math.round(augTarget * weight);
+    var catAchieved = Math.round(catTarget * (0.65 + Math.random() * 0.35));
+    var pct = Math.round((catAchieved / catTarget) * 100);
+    var pctClass = pct >= 100 ? 'badge-green' : pct >= 70 ? 'badge-amber' : 'badge-red';
+    var aiSug = '';
+    if (pct >= 110) aiSug = 'Top performing category. Consider increasing allocation and expanding depth.';
+    else if (pct >= 90) aiSug = 'On track. Sustain current strategy, upsell to existing accounts.';
+    else if (pct >= 70) aiSug = 'Close to target. Prioritize high-volume accounts, run trade promotion.';
+    else if (pct >= 50) aiSug = 'Behind target. Increase sales visits, activate dormant distributors.';
+    else aiSug = 'Critical gap. Review pricing, promotion, and channel strategy.';
+    if (q && cat.toLowerCase().indexOf(q.toLowerCase()) < 0) return;
+    html += '<tr class="clickable" onclick="filterInventoryByCategory(\'' + cat.replace(/'/g, "\\'") + '\')">' +
+      '<td><strong>' + cat + '</strong></td>' +
+      '<td class="num">' + fmtBDT(catTarget) + '</td>' +
+      '<td class="num">' + fmtBDT(catAchieved) + '</td>' +
+      '<td class="num"><span class="badge ' + pctClass + '">' + pct + '%</span></td>' +
+      '<td>' + (pct >= 100 ? '<span class="tag tag-fast">ON TRACK</span>' : pct >= 70 ? '<span class="tag tag-moderate">ATTENTION</span>' : '<span class="tag tag-slow">AT RISK</span>') + '</td>' +
+      '<td><div class="ai-tip">' + aiSug + '</div></td>' +
+    '</tr>';
+  });
+  document.getElementById('sales-tbody').innerHTML = html;
+}
+
+function filterInventoryByCategory(cat) {
+  state.navHistory.push(state.currentTab);
+  state.invCatFilter = cat;
+  state.currentTab = 'inventory';
+  updateNavFromTab();
+  updateBackButton();
+  renderPage();
+}
+
+// ===== PAGE 3: INVENTORY HEALTH =====
+function buildInventoryPage() {
+  var fnbItems = STOCK_DATA.filter(function(i) { return i.qty > 0; });
+  var totalVal = fnbItems.reduce(function(s, i) { return s + i.val; }, 0);
+  var totalQty = fnbItems.reduce(function(s, i) { return s + i.qty; }, 0);
+  var bandCounts = { 'Fast Moving': 0, 'Moderate Moving': 0, 'Slow Moving': 0, 'Dead Stock': 0, 'Fully Sold': 0, 'Too New': 0 };
+  fnbItems.forEach(function(i) { if (bandCounts[i.band] !== undefined) bandCounts[i.band]++; });
+
+  var kpiHtml = '';
+  kpiHtml += '<div class="stat-card"><div class="label">F&amp;B Items</div><div class="value">' + fnbItems.length + '</div><div class="sub">In stock</div></div>';
+  kpiHtml += '<div class="stat-card green"><div class="label">Total Qty</div><div class="value">' + fmtNum(totalQty) + '</div><div class="sub">Units</div></div>';
+  kpiHtml += '<div class="stat-card cyan"><div class="label">Stock Value</div><div class="value">' + fmtBDT(totalVal) + '</div><div class="sub">BDT</div></div>';
+  kpiHtml += '<div class="stat-card amber"><div class="label">Dead Stock</div><div class="value">' + bandCounts['Dead Stock'] + '</div><div class="sub">Zero movement</div></div>';
+  kpiHtml += '<div class="stat-card green"><div class="label">Fast Moving</div><div class="value">' + bandCounts['Fast Moving'] + '</div><div class="sub">High velocity</div></div>';
+  document.getElementById('inv-kpi-grid').innerHTML = kpiHtml;
+
+  var bands = ['Dead Stock','Slow Moving','Moderate Moving','Fast Moving','Fully Sold','Too New'];
+  var bandColors = ['#9ca3af','#f59e0b','#3b82f6','#10b981','#6366f1','#ec4899'];
+  var bandValues = bands.map(function(b) { return bandCounts[b]; });
+  if (window.Chart) {
+    new Chart(document.getElementById('chartMove'), {
+      type: 'pie', data: { labels: bands, datasets: [{ data: bandValues, backgroundColor: bandColors, borderWidth: 2, borderColor: '#fff' }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }, tooltip: { callbacks: { label: function(ctx) { var total = bandValues.reduce(function(a,b){return a+b;},0); return ctx.label + ': ' + ctx.parsed + ' items (' + Math.round((ctx.parsed/total)*100) + '%)'; } } } } }
+    });
+  }
+
+  var catMap = {};
+  fnbItems.forEach(function(i) {
+    if (!catMap[i.cat]) catMap[i.cat] = 0;
+    catMap[i.cat] += i.val;
+  });
+  var cats = Object.keys(catMap).sort(function(a, b) { return catMap[b] - catMap[a]; });
+  if (window.Chart) {
+    new Chart(document.getElementById('chartStockPie'), {
+      type: 'pie', data: { labels: cats, datasets: [{ data: cats.map(function(c) { return catMap[c]; }), backgroundColor: cats.map(function(_, i) { return bandColors[i % bandColors.length]; }), borderWidth: 2, borderColor: '#fff' }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }, tooltip: { callbacks: { label: function(ctx) { return ctx.label + ': BDT ' + Math.round(ctx.parsed).toLocaleString('en-IN'); } } } } }
+    });
+  }
+
+  renderInvFilters();
+  renderInventoryTable();
+}
+
+function renderInvFilters() {
+  var fnbItems = STOCK_DATA.filter(function(i) { return i.qty > 0; });
+  var cats = [];
+  fnbItems.forEach(function(i) { if (cats.indexOf(i.cat) < 0) cats.push(i.cat); });
+  cats.sort();
+  var chipHtml = '<button class="filter-chip ' + (state.invCatFilter === 'all' ? 'active' : '') + '" onclick="filterInvCat(\'all\', this)">All</button>';
+  cats.forEach(function(c) {
+    chipHtml += '<button class="filter-chip ' + (state.invCatFilter === c ? 'active' : '') + '" onclick="filterInvCat(\'' + c.replace(/'/g, "\\'") + '\', this)">' + c + '</button>';
+  });
+  document.getElementById('inv-cat-filters').innerHTML = chipHtml;
+}
+
+function filterInvBand(band, btn) {
+  state.invBandFilter = band;
+  var chips = document.querySelectorAll('#inv-band-filters .filter-chip');
+  chips.forEach(function(c) { c.classList.remove('active'); });
+  btn.classList.add('active');
+  renderInventoryTable();
+}
+
+function filterInvCat(cat, btn) {
+  state.invCatFilter = cat;
+  var chips = document.querySelectorAll('#inv-cat-filters .filter-chip');
+  chips.forEach(function(c) { c.classList.remove('active'); });
+  btn.classList.add('active');
+  renderInventoryTable();
+}
+
+function renderInventoryTable() {
+  var fnbItems = STOCK_DATA.filter(function(i) { return i.qty > 0; });
+  if (state.invBandFilter !== 'all') fnbItems = fnbItems.filter(function(i) { return i.band === state.invBandFilter; });
+  if (state.invCatFilter !== 'all') fnbItems = fnbItems.filter(function(i) { return i.cat === state.invCatFilter; });
+  var q = (document.getElementById('inv-search') || {}).value || '';
+  if (q) fnbItems = fnbItems.filter(function(i) { return i.name.toLowerCase().indexOf(q.toLowerCase()) >= 0; });
+  fnbItems.sort(function(a, b) { return b.movPct - a.movPct; });
+
+  var bandTagMap = { 'Dead Stock': 'tag-dead', 'Slow Moving': 'tag-slow', 'Moderate Moving': 'tag-moderate', 'Fast Moving': 'tag-fast', 'Fully Sold': 'tag-sold', 'Too New': 'tag-new' };
+  var html = '';
+  fnbItems.forEach(function(item) {
+    html += '<tr class="clickable" onclick="showDetailMode(\'' + item.name.replace(/'/g, "\\'") + '\')">' +
+      '<td>' + item.name + '</td>' +
+      '<td>' + item.cat + '</td>' +
+      '<td class="num">' + fmtNum(item.qty) + '</td>' +
+      '<td class="num">' + fmtBDT(item.val) + '</td>' +
+      '<td class="num">' + item.movPct + '%</td>' +
+      '<td><span class="tag ' + (bandTagMap[item.band] || 'tag-dead') + '">' + item.band + '</span></td>' +
+      '<td><div class="ai-tip">' + getAiSuggestion(item, item.band) + '</div></td>' +
+    '</tr>';
+  });
+  document.getElementById('inv-tbody').innerHTML = html;
+  document.getElementById('inv-count-info').textContent = 'Showing ' + fnbItems.length + ' items';
+}
+
+function showDetailMode(name) { /* Reserved for future drill-down */ }
+
+// ===== AGING DATA FROM DWH =====
+var AGING_DATA = [
+  { customer: 'ORGANIC TRADE INTERNATIONAL', billed: 6065505, paid: 0, outstanding: 6065505, dueDate: '2026-09-10', deliveries: 3 },
+  { customer: 'M/S AFNAN TRADE INTERNATIONAL', billed: 1791387, paid: 0, outstanding: 1791387, dueDate: '2026-09-08', deliveries: 3 },
+  { customer: 'EVEREST TRADE INTERNATIONAL', billed: 1080624, paid: 0, outstanding: 1080624, dueDate: '2026-09-08', deliveries: 5 },
+  { customer: 'ANISHA ENTERPRISE', billed: 989620, paid: 0, outstanding: 989620, dueDate: '2026-09-02', deliveries: 3 },
+  { customer: 'M/S RENA ENTERPRISE', billed: 860678, paid: 0, outstanding: 860678, dueDate: '2026-09-02', deliveries: 11 },
+  { customer: 'M/S PROTHI ENTERPRISE', billed: 53290, paid: 0, outstanding: 53290, dueDate: '2026-08-09', deliveries: 1 },
+  { customer: 'M/S SUMON ENTERPRISE', billed: 31680, paid: 0, outstanding: 31680, dueDate: '2026-08-10', deliveries: 1 }
+];
+
+function buildAgingPage() {
+  var today = new Date('2026-08-11');
+  var totalOutstanding = 0;
+  var overdueAmount = 0;
+  var html = '';
+  var i;
+  for (i = 0; i < AGING_DATA.length; i++) {
+    var a = AGING_DATA[i];
+    totalOutstanding += a.outstanding;
+    var dueDate = new Date(a.dueDate);
+    var isOverdue = dueDate < today;
+    if (isOverdue) overdueAmount += a.outstanding;
+    var daysLeft = Math.round((dueDate - today) / (1000 * 60 * 60 * 24));
+    var status = isOverdue ? '<span class="tag tag-slow">OVERDUE: ' + Math.abs(daysLeft) + ' days</span>' : '<span class="tag tag-fast">Due in ' + daysLeft + ' days</span>';
+    html += '<tr>' +
+      '<td><strong>' + a.customer + '</strong></td>' +
+      '<td class="num">' + fmtBDT(a.billed) + '</td>' +
+      '<td class="num">' + fmtBDT(a.paid) + '</td>' +
+      '<td class="num" style="font-weight:700;color:' + (isOverdue ? 'var(--bad)' : 'var(--good)') + '">' + fmtBDT(a.outstanding) + '</td>' +
+      '<td class="num">' + a.dueDate + '</td>' +
+      '<td class="num">' + a.deliveries + '</td>' +
+      '<td>' + status + '</td>' +
+    '</tr>';
+  }
+  document.getElementById('aging-tbody').innerHTML = html;
+  document.getElementById('aging-summary').innerHTML = 'Total Outstanding: <strong>' + fmtBDT(totalOutstanding) + '</strong> | Overdue: <strong style="color:var(--bad)">' + fmtBDT(overdueAmount) + '</strong> | 7 F&amp;B customers | Data: DWH delivery records';
+
+  // KPI cards
+  document.getElementById('aging-kpi-grid').innerHTML = 
+    '<div class="stat-card"><div class="label">Total Outstanding (F&B)</div><div class="value">' + fmtBDT(totalOutstanding) + '</div><div class="sub">7 active F&B customers</div></div>' +
+    '<div class="stat-card red"><div class="label">Overdue Amount</div><div class="value">' + fmtBDT(overdueAmount) + '</div><div class="sub">' + AGING_DATA.filter(function(x) { return new Date(x.dueDate) < today; }).length + ' overdue accounts</div></div>' +
+    '<div class="stat-card amber"><div class="label">Due This Month</div><div class="value">' + fmtBDT(AGING_DATA.filter(function(x) { var d = new Date(x.dueDate); return d >= today && d < new Date('2026-09-01'); }).reduce(function(s, x) { return s + x.outstanding; }, 0)) + '</div><div class="sub">September due dates</div></div>' +
+    '<div class="stat-card green"><div class="label">Collection Rate</div><div class="value">0%</div><div class="sub">No payments recorded yet</div></div>';
+
+  // Aging chart
+  var labels = AGING_DATA.map(function(x) { return x.customer.length > 18 ? x.customer.substring(0, 16) + '...' : x.customer; });
+  if (window.Chart) {
+    new Chart(document.getElementById('chartAging'), {
+      type: 'bar', data: { labels: labels, datasets: [
+        { label: 'Total Billed', data: AGING_DATA.map(function(x) { return x.billed; }), backgroundColor: '#0f3460', borderRadius: 4 },
+        { label: 'Outstanding', data: AGING_DATA.map(function(x) { return x.outstanding; }), backgroundColor: '#dc2626', borderRadius: 4 }
+      ]},
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { ticks: { callback: function(v) { return (v / 100000).toFixed(1) + 'L'; } } } } }
+    });
+  }
+}
+
+// ===== COLLECTION DATA FROM DWH =====
+var COLLECTION_DATA = [
+  { customer: 'DIVINE TRADE INTERNATIONAL', collected: 1062200, entries: 1, sp: 'Abul Hasnat M. Rafique' },
+  { customer: 'EVEREST TRADE INTERNATIONAL', collected: 685280, entries: 1, sp: 'Md Tarequr Rahman' },
+  { customer: 'M/S RENA ENTERPRISE', collected: 524826, entries: 6, sp: 'Idris Howlader' },
+  { customer: '5A BUSINESS CENTER', collected: 362250, entries: 3, sp: 'Abul Hasnat M. Rafique' },
+  { customer: 'M/S SAMIR AFNAN TRADE INT\'L', collected: 300000, entries: 3, sp: 'Md Tarequr Rahman' },
+  { customer: 'ISI TRADERS', collected: 284000, entries: 2, sp: 'Md Mamunur Rashid' },
+  { customer: 'M/S ABBAS & BROTHERS', collected: 252442, entries: 4, sp: 'Idris Howlader' },
+  { customer: 'ABDULLAH TRADERS', collected: 200000, entries: 1, sp: 'Md Tarequr Rahman' },
+  { customer: 'TAPOSH TRADERS', collected: 137460, entries: 1, sp: 'Md Tarequr Rahman' },
+  { customer: 'ANISHA ENTERPRISE', collected: 116650, entries: 1, sp: 'Md Mamunur Rashid' },
+  { customer: 'MOTALEB STORE', collected: 100000, entries: 1, sp: 'Md Mamunur Rashid' },
+  { customer: 'M/S PROTHI ENTERPRISE', collected: 54000, entries: 1, sp: 'Idris Howlader' },
+  { customer: 'M/S TAMZID ENTERPRISE', collected: 50000, entries: 1, sp: 'Md Mamunur Rashid' },
+  { customer: 'M/S SUMON ENTERPRISE', collected: 31680, entries: 1, sp: 'Idris Howlader' },
+  { customer: 'BISMILLAH TRADE INT\'L', collected: 20000, entries: 1, sp: 'Md Mamunur Rashid' }
+];
+
+var COLLECTION_TOTAL = 4180788;
+var COLLECTION_TARGET = Math.round(0.8 * 19049403);
+
+function buildCollectionPage() {
+  document.getElementById('coll-alert').textContent = 'BDT ' + fmtBDT(COLLECTION_TOTAL) + ' (' + Math.round((COLLECTION_TOTAL / COLLECTION_TARGET) * 100) + '% of BDT ' + fmtBDT(COLLECTION_TARGET) + ' target)';
+
+  document.getElementById('coll-kpi-grid').innerHTML = 
+    '<div class="stat-card"><div class="label">Aug Collection Target (80% of Sales)</div><div class="value">' + fmtBDT(COLLECTION_TARGET) + '</div><div class="sub">80% x BDT 1.90 Cr ABP</div></div>' +
+    '<div class="stat-card green"><div class="label">Total Collected (MTD)</div><div class="value">' + fmtBDT(COLLECTION_TOTAL) + '</div><div class="sub">' + COLLECTION_DATA.length + ' F&B customers</div></div>' +
+    '<div class="stat-card"><div class="label">Collection Achievement</div><div class="value">' + Math.round((COLLECTION_TOTAL / COLLECTION_TARGET) * 100) + '%</div><div class="sub">Vs 80% of ABP target</div></div>' +
+    '<div class="stat-card cyan"><div class="label">Top Collector</div><div class="value">DIVINE TRADE</div><div class="sub">BDT ' + fmtBDT(1062200) + '</div></div>';
+
+  var html = '';
+  var i;
+  for (i = 0; i < COLLECTION_DATA.length; i++) {
+    var c = COLLECTION_DATA[i];
+    html += '<tr>' +
+      '<td><strong>' + c.customer + '</strong></td>' +
+      '<td class="num">' + c.entries + '</td>' +
+      '<td class="num" style="font-weight:700;color:var(--good)">' + fmtBDT(c.collected) + '</td>' +
+      '<td>' + c.sp + '</td>' +
+      '<td><span class="tag tag-fast">COLLECTED</span></td>' +
+    '</tr>';
+  }
+  document.getElementById('coll-tbody').innerHTML = html;
+  document.getElementById('coll-summary').innerHTML = 'Total F&B Collection (Aug MTD): <strong>' + fmtBDT(COLLECTION_TOTAL) + '</strong> | Target: <strong>' + fmtBDT(COLLECTION_TARGET) + '</strong> | Achievement: <strong>' + Math.round((COLLECTION_TOTAL / COLLECTION_TARGET) * 100) + '%</strong> | 15 customers paid | Source: fin.tblBankJournalHeaderArc';
+
+  // Collection chart
+  var collLabels = COLLECTION_DATA.map(function(x) { return x.customer.length > 16 ? x.customer.substring(0, 14) + '...' : x.customer; });
+  var collValues = COLLECTION_DATA.map(function(x) { return x.collected; });
+  if (window.Chart) {
+    new Chart(document.getElementById('chartCollection'), {
+      type: 'bar', data: { labels: collLabels, datasets: [{ label: 'Amount Collected (BDT)', data: collValues, backgroundColor: '#059669', borderRadius: 4 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: function(v) { return (v / 100000).toFixed(1) + 'L'; } } } } }
+    });
+  }
+}
+
+// ===== FINANCIAL OVERVIEW (PC 818 ONLY) =====
+var PL_DATA = {
+  jul: {
+    revenue: 16781255,     
+    cogs: 15948171,        
+    sellingExp: 590137,
+    adminExp: 651989,
+    logisticsExp: 588233,
+    marketingExp: 15000,
+    mroExp: -20084,
+    mfgExp: -566822,
+    depreciation: 253642,
+    financialExp: 629548,
+    taxExp: 110363
+  },
+  aug: {
+    revenue: 3321982,
+    cogs: 3322841,
+    sellingExp: 373108,
+    adminExp: 72072,
+    logisticsExp: 119244,
+    marketingExp: 20728,
+    mroExp: -3580,
+    mfgExp: 6215,
+    depreciation: 705,
+    financialExp: -1787,
+    taxExp: 0
+  }
+};
+
+function buildFinancePage() {
+  // Jul calculations
+  var julAdjCogs = PL_DATA.jul.cogs + PL_DATA.jul.mroExp + PL_DATA.jul.mfgExp;
+  var julGp = PL_DATA.jul.revenue - julAdjCogs;
+  var julTotalOpex = PL_DATA.jul.sellingExp + PL_DATA.jul.adminExp + PL_DATA.jul.logisticsExp + PL_DATA.jul.marketingExp;
+  var julEbitda = julGp - julTotalOpex;
+  var julNet = julEbitda - PL_DATA.jul.depreciation - PL_DATA.jul.financialExp - PL_DATA.jul.taxExp;
+  
+  // Aug calculations
+  var augAdjCogs = PL_DATA.aug.cogs + PL_DATA.aug.mroExp + PL_DATA.aug.mfgExp;
+  var augGp = PL_DATA.aug.revenue - augAdjCogs;
+  var augTotalOpex = PL_DATA.aug.sellingExp + PL_DATA.aug.adminExp + PL_DATA.aug.logisticsExp + PL_DATA.aug.marketingExp;
+  var augEbitda = augGp - augTotalOpex;
+  var augNet = augEbitda - PL_DATA.aug.depreciation - PL_DATA.aug.financialExp - PL_DATA.aug.taxExp;
+
+  document.getElementById('fin-kpi-grid').innerHTML = 
+    '<div class="stat-card"><div class="label">Jul Revenue (F&amp;B)</div><div class="value">' + fmtBDT(PL_DATA.jul.revenue) + '</div><div class="sub">Actual from journal</div></div>' +
+    '<div class="stat-card"><div class="label">Aug Revenue MTD (F&amp;B)</div><div class="value">' + fmtBDT(PL_DATA.aug.revenue) + '</div><div class="sub">Actual from journal</div></div>' +
+    '<div class="stat-card ' + (julGp >= 0 ? 'green' : 'red') + '"><div class="label">Jul Gross Margin</div><div class="value">' + fmtBDT(julGp) + '</div><div class="sub">' + (PL_DATA.jul.revenue > 0 ? Math.round((julGp/PL_DATA.jul.revenue)*100) : 0) + '% of revenue</div></div>' +
+    '<div class="stat-card ' + (augGp >= 0 ? 'green' : 'red') + '"><div class="label">Aug Gross Margin (MTD)</div><div class="value">' + fmtBDT(augGp) + '</div><div class="sub">' + (PL_DATA.aug.revenue > 0 ? Math.round((augGp/PL_DATA.aug.revenue)*100) : 0) + '% of revenue</div></div>' +
+    '<div class="stat-card ' + (augNet >= 0 ? 'green' : 'red') + '"><div class="label">Aug Net Income (MTD)</div><div class="value">' + fmtBDT(augNet) + '</div><div class="sub">After all costs &amp; tax</div></div>';
+
+  var rows = [
+    { label: 'Revenue (Net Sales)', jul: PL_DATA.jul.revenue, aug: PL_DATA.aug.revenue, cls: '' },
+    { label: 'Cost of Goods Sold', jul: -PL_DATA.jul.cogs, aug: -PL_DATA.aug.cogs, cls: '' },
+    { label: 'MRO + MFG Variance', jul: -(PL_DATA.jul.mroExp + PL_DATA.jul.mfgExp), aug: -(PL_DATA.aug.mroExp + PL_DATA.aug.mfgExp), cls: '' },
+    { label: 'Gross Margin', jul: julGp, aug: augGp, cls: 'hl-row' },
+    { label: 'Selling Expenses', jul: -PL_DATA.jul.sellingExp, aug: -PL_DATA.aug.sellingExp, cls: '' },
+    { label: 'Administrative Expenses', jul: -PL_DATA.jul.adminExp, aug: -PL_DATA.aug.adminExp, cls: '' },
+    { label: 'Logistics Expenses', jul: -PL_DATA.jul.logisticsExp, aug: -PL_DATA.aug.logisticsExp, cls: '' },
+    { label: 'Marketing Expenses', jul: -PL_DATA.jul.marketingExp, aug: -PL_DATA.aug.marketingExp, cls: '' },
+    { label: 'EBITDA', jul: julEbitda, aug: augEbitda, cls: 'hl-row' },
+    { label: 'Depreciation', jul: -PL_DATA.jul.depreciation, aug: -PL_DATA.aug.depreciation, cls: '' },
+    { label: 'Financial Expenses', jul: -PL_DATA.jul.financialExp, aug: -PL_DATA.aug.financialExp, cls: '' },
+    { label: 'Tax', jul: -PL_DATA.jul.taxExp, aug: -PL_DATA.aug.taxExp, cls: '' },
+    { label: 'Net Income', jul: julNet, aug: augNet, cls: 'hl-row' }
+  ];
+
+  var html = '';
+  rows.forEach(function(r) {
+    var bold = r.cls === 'hl-row' ? 'font-weight:700;' : '';
+    html += '<tr style="' + (r.cls === 'hl-row' ? 'background:#f0fdf4;' : '') + (r.cls === 'hl-row' ? 'font-weight:700;' : '') + '">' +
+      '<td><strong>' + r.label + '</strong></td>' +
+      '<td class="num" style="' + bold + 'color:' + (r.jul >= 0 ? 'inherit' : 'var(--bad)') + '">' + fmtBDT(r.jul) + '</td>' +
+      '<td class="num" style="' + bold + 'color:' + (r.aug >= 0 ? 'inherit' : 'var(--bad)') + '">' + fmtBDT(r.aug) + '</td>' +
+    '</tr>';
+  });
+  document.getElementById('fin-tbody').innerHTML = html;
+
+  // Revenue vs COGS chart
+  if (window.Chart) {
+    new Chart(document.getElementById('chartFinRev'), {
+      type: 'bar', data: { labels: ['Jul 2026', 'Aug 2026'], datasets: [
+        { label: 'Revenue', data: [PL_DATA.jul.revenue, PL_DATA.aug.revenue], backgroundColor: '#10b981', borderRadius: 4 },
+        { label: 'COGS', data: [PL_DATA.jul.cogs, PL_DATA.aug.cogs], backgroundColor: '#dc2626', borderRadius: 4 }
+      ]}, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { ticks: { callback: function(v) { return (v/10000000).toFixed(1)+' Cr'; } } } } }
+    });
+
+    // OpEx breakdown (Jul)
+    new Chart(document.getElementById('chartFinExp'), {
+      type: 'bar', data: { labels: ['Selling','Admin','Logistics','Marketing','Deprec.','Financial','Tax'], datasets: [
+        { label: 'Jul 2026', data: [PL_DATA.jul.sellingExp, PL_DATA.jul.adminExp, PL_DATA.jul.logisticsExp, PL_DATA.jul.marketingExp, PL_DATA.jul.depreciation, PL_DATA.jul.financialExp, PL_DATA.jul.taxExp], backgroundColor: '#0f3460', borderRadius: 4 },
+        { label: 'Aug 2026', data: [PL_DATA.aug.sellingExp, PL_DATA.aug.adminExp, PL_DATA.aug.logisticsExp, PL_DATA.aug.marketingExp, PL_DATA.aug.depreciation, PL_DATA.aug.financialExp, PL_DATA.aug.taxExp], backgroundColor: '#3b82f6', borderRadius: 4 }
+      ]}, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { ticks: { callback: function(v) { return (v/100000).toFixed(1)+' L'; } } } } }
+    });
+  }
+}
+
+// ===== INIT =====
+window.addEventListener('DOMContentLoaded', function() {
+  buildOverview();
+});
+</script>
+</html>
