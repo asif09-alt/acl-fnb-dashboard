@@ -29,6 +29,11 @@ button { cursor: pointer; font-family: inherit; } input, select { font-family: i
 .btn-back { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 6px 14px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; transition: all 0.2s; display: none; }
 .btn-back:hover { background: rgba(255,255,255,0.25); }
 .btn-back.show { display: inline-block; }
+.btn-refresh { background: var(--gold); color: var(--primary); border: none; padding: 7px 16px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.btn-refresh:hover { filter: brightness(1.15); }
+.btn-refresh.loading { opacity: 0.7; pointer-events: none; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.btn-refresh .spinner { display: inline-block; animation: spin 0.8s linear infinite; margin-right: 4px; }
 
 .nav-bar { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 78px; z-index: 99; padding: 0 28px; display: flex; gap: 0; overflow-x: auto; }
 .nav-btn { padding: 13px 22px; border: none; background: none; font-size: 0.83rem; font-weight: 600; color: var(--muted); border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; }
@@ -125,7 +130,8 @@ footer { text-align: center; padding: 20px; font-size: 0.72rem; color: #9ca3af; 
   </div>
   <div class="header-right">
     <button class="btn-back" id="btnBack" onclick="goBack()">← Back</button>
-    <span class="badge">Aug 2026</span>
+    <span class="badge" id="header-date"></span>
+    <button class="btn-refresh" id="btnRefresh" onclick="refreshDashboard()">↻ Refresh Data</button>
   </div>
 </div>
 
@@ -423,8 +429,8 @@ footer { text-align: center; padding: 20px; font-size: 0.72rem; color: #9ca3af; 
 </div>
 
 <footer>
-  <p>SBU 221 — Akij Commodities Ltd. (ACL) &middot; Profit Center 818 — Food &amp; Beverage &middot; Data as of August 2026</p>
-  <p>Sources: DWH (oms.tblSalesInvoiceArc, wms.tblInventoryTransactionRowArc, itm.tblItemArc, dco.tblbusinessunitArc) &middot; ABP FY 2026-27 &middot; F&B_ACL_Budget.xlsx &middot; Budget_vs_Proposed_Purchase_August.xlsx &middot; ACL Customer Profile (Google Sheet) &middot; NBR Import Statement</p>
+  <p>SBU 221 — Akij Commodities Ltd. (ACL) &middot; Profit Center 818 — Food &amp; Beverage</p>
+  <p>Last data refresh: 11 Aug 2026 from DWH &middot; Sources: oms.tblSalesOrderHeaderArc, fin.tblAccountingJournalArc, fin.tblBankJournalHeaderArc, sms.tblDeliveryHeaderArc</p>
 </footer>
 </body>
 
@@ -1035,7 +1041,21 @@ function buildFinancePage() {
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', function() {
   buildOverview();
+  setHeaderDate();
 });
+
+function setHeaderDate() {
+  var now = new Date();
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('header-date').textContent = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+}
+
+function refreshDashboard() {
+  var btn = document.getElementById('btnRefresh');
+  btn.innerHTML = '<span class="spinner">⟳</span> Refreshing...';
+  btn.classList.add('loading');
+  setTimeout(function() { location.reload(true); }, 800);
+}
 </script>
 </html>
 
