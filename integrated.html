@@ -533,7 +533,7 @@ td b{color:var(--text)}
         <tr><td>Supply Chain / Procurement / Import lead (batch/expiry, import tracking, LC)</td><td><b>CSCO</b></td></tr>
       </tbody>
     </table>
-    <div class="note">Date basis: P0 → 30 Sep 2026 · P1 → 30 Nov 2026 · P2 → 31 Jan 2027 · P3 → 31 Mar 2027 (proposed; adjust as needed).</div>
+    <div class="note">Confirmed dates: 31-Aug-26 (LC/FX, landed cost) · 15-Sep-26 (strategy, category, brand, SKU, demand, S&OP, credit, working capital, planning, KPI) · 30-Sep-26 (all remaining). INTACT chains (Procurement→Import, Sales→Collection) have no date.</div>
   </div>
 
   <div class="card">
@@ -972,49 +972,49 @@ EV.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td><b>${r[0]
 // ---------- CLOSURE SCHEDULE ----------
 const OWNERS={IH:"Md. Imran Hossen",SH:"Md. Sajjad Hossain",BA:"Bashir Alam",HR:"H M Omar Hasnain Real",TBA:"CSCO"};
 const SCHED_GAP=[
-["G-02","No batch/lot/expiry (manual today)","BA","30 Sep 2026","Batch/expiry register + FEFO release list signed by Warehouse Head","P0"],
-["G-04","Inventory not valued in books","SH","30 Sep 2026","Finance-signed GL reconciliation (ERP stock vs GL)","P0"],
-["G-05","Import shipment tracking not F&B-isolable","TBA","30 Nov 2026","Live import milestone tracker (PI/LC → GRN)","P0"],
-["G-06","True contribution unknowable","IH","30 Nov 2026","SKU/customer/channel contribution report","P0"],
-["G-07","No executive command center","IH","30 Nov 2026","Exception→decision cockpit live","P0"],
-["G-09","No channels / distributors","IH","30 Nov 2026","Channel master + RTM onboarding plan","P1"],
-["G-10","AKIJ OASIS not a brand object","IH","30 Nov 2026","Brand master with OASIS SKUs mapped","P1"],
-["G-11","No formal S&OP / forecast system","IH","30 Nov 2026","Monthly consensus forecast approved","P1"],
-["G-12","No pricing rules","IH + SH","30 Sep 2026","Approved price circular with margin floor","P0"],
-["G-13","FX / LC cost not analyzed","SH","31 Jan 2027","LC maturity + FX exposure register","P1"],
-["G-14","Regulatory / permits unused","TBA","31 Jan 2027","Permit/COO/health certificate tracker","P1"],
-["G-16","No sales force / field sales","IH","31 Jan 2027","Sales force + field app onboarding","P2"],
-["G-17","No promotions","IH","31 Jan 2027","Trade offer setup with ROI economics","P2"],
-["G-18","No market / strategy management","IH","31 Jan 2027","Market intelligence feed → category strategy","P2"],
-["G-19","Risk / KRI / control register","SH","31 Jan 2027","Risk/KRI register with owners","P1"],
-["G-20","AI decision layer","HR","31 Mar 2027","Governed AI readiness assessment","P3"],
-["G-21","Stock-out risk on high-demand SKUs","IH + BA","30 Sep 2026","Replenishment plan + stock cover ≥ 2 months on core SKUs","P0"],
-["G-22","No demand planning from market data","IH","30 Nov 2026","Demand plan linked to survey + DWH sales","P0"],
-["G-24","Market intelligence not systematized","IH","31 Jan 2027","Structured market-intel feed","P1"]
+["G-02","No batch/lot/expiry (manual today)","BA","30-Sep-26","Batch/expiry register + FEFO release list signed by Warehouse Head","P0"],
+["G-04","Inventory not valued in books","SH","30-Sep-26","Finance-signed GL reconciliation (ERP stock vs GL)","P0"],
+["G-05","Import shipment tracking not F&B-isolable","TBA","30-Sep-26","Live import milestone tracker (PI/LC → GRN)","P0"],
+["G-06","True contribution unknowable","IH","30-Sep-26","SKU/customer/channel contribution report","P0"],
+["G-07","No executive command center","IH","30-Sep-26","Exception→decision cockpit live","P0"],
+["G-09","No channels / distributors","IH","30-Sep-26","Channel master + RTM onboarding plan","P1"],
+["G-10","AKIJ OASIS not a brand object","IH","30-Sep-26","Brand master with OASIS SKUs mapped","P1"],
+["G-11","No formal S&OP / forecast system","IH","15-Sep-26","Monthly consensus forecast approved","P1"],
+["G-12","No pricing rules","IH + SH","30-Sep-26","Approved price circular with margin floor","P0"],
+["G-13","FX / LC cost not analyzed","SH","31-Aug-26","LC maturity + FX exposure register","P1"],
+["G-14","Regulatory / permits unused","TBA","30-Sep-26","Permit/COO/health certificate tracker","P1"],
+["G-16","No sales force / field sales","IH","30-Sep-26","Sales force + field app onboarding","P2"],
+["G-17","No promotions","IH","30-Sep-26","Trade offer setup with ROI economics","P2"],
+["G-18","No market / strategy management","IH","15-Sep-26","Market intelligence feed → category strategy","P2"],
+["G-19","Risk / KRI / control register","SH","30-Sep-26","Risk/KRI register with owners","P1"],
+["G-20","AI decision layer","HR","30-Sep-26","Governed AI readiness assessment","P3"],
+["G-21","Stock-out risk on high-demand SKUs","IH + BA","30-Sep-26","Replenishment plan + stock cover ≥ 2 months on core SKUs","P0"],
+["G-22","No demand planning from market data","IH","15-Sep-26","Demand plan linked to survey + DWH sales","P0"],
+["G-24","Market intelligence not systematized","IH","30-Sep-26","Structured market-intel feed","P1"]
 ];
 const SCHED_CHAIN=[
-["Market → Category","break","IH","30 Nov 2026","Market-intelligence feed → category strategy"],
-["Category → Brand","break","IH","30 Nov 2026","Brand master + brand→category mapping"],
-["Brand → SKU","partial","IH","30 Nov 2026","Brand/principal/COO columns in item master"],
-["SKU → Demand Forecast","break","IH","30 Nov 2026","Forecast by SKU + season + promo"],
-["Demand → Procurement","partial","TBA","30 Nov 2026","Forecast → PR proposal link"],
+["Market → Category","break","IH","30-Sep-26","Market-intelligence feed → category strategy"],
+["Category → Brand","break","IH","15-Sep-26","Brand master + brand→category mapping"],
+["Brand → SKU","partial","IH","15-Sep-26","Brand/principal/COO columns in item master"],
+["SKU → Demand Forecast","break","IH","15-Sep-26","Forecast by SKU + season + promo"],
+["Demand → Procurement","partial","TBA","30-Sep-26","Forecast → PR proposal link"],
 ["Procurement → Import","ok","TBA","—","keep"],
-["Import → Landed Cost","partial","SH","30 Sep 2026","F&B landed-cost master per SKU"],
-["Landed Cost → Inventory","break","SH","30 Sep 2026","Landed cost capitalized to stock"],
-["Inventory → Batch","break","BA","30 Sep 2026","Batch at GRN"],
-["Batch → Expiry","break","BA","30 Sep 2026","Expiry + FEFO release"],
-["Batch → Customer","break","BA","30 Nov 2026","Batch pick + issue"],
-["Customer → Sales","partial","IH","30 Nov 2026","Credit check + price validation"],
+["Import → Landed Cost","partial","SH","31-Aug-26","F&B landed-cost master per SKU"],
+["Landed Cost → Inventory","break","SH","30-Sep-26","Landed cost capitalized to stock"],
+["Inventory → Batch","break","BA","30-Sep-26","Batch at GRN"],
+["Batch → Expiry","break","BA","30-Sep-26","Expiry + FEFO release"],
+["Batch → Customer","break","BA","30-Sep-26","Batch pick + issue"],
+["Customer → Sales","partial","IH","30-Sep-26","Credit check + price validation"],
 ["Sales → Collection","ok","IH + SH","—","keep"],
-["SKU → Profitability","break","IH","30 Nov 2026","Contribution model"],
-["Inventory → Working Capital","break","SH","30 Sep 2026","Inventory valuation & reconciliation"],
-["Quality → Supplier Performance","break","TBA","31 Jan 2027","Quality + supplier scorecard"],
-["Complaint → Batch Traceability","break","BA","30 Nov 2026","Batch + complaint link"],
-["Strategy → KPI","break","IH","31 Jan 2027","Strategy → KPI registry"],
-["KPI → Initiative","break","IH","31 Jan 2027","Initiative management"],
-["Exception → Decision","break","IH","30 Nov 2026","Exception → decision cockpit"],
-["Decision → Action","break","IH","30 Nov 2026","Decision/action register"],
-["Action → Outcome → Learning","break","IH","31 Jan 2027","Outcome tracking"]
+["SKU → Profitability","break","IH","30-Sep-26","Contribution model"],
+["Inventory → Working Capital","break","SH","15-Sep-26","Inventory valuation & reconciliation"],
+["Quality → Supplier Performance","break","TBA","30-Sep-26","Quality + supplier scorecard"],
+["Complaint → Batch Traceability","break","BA","30-Sep-26","Batch + complaint link"],
+["Strategy → KPI","break","IH","15-Sep-26","Strategy → KPI registry"],
+["KPI → Initiative","break","IH","30-Sep-26","Initiative management"],
+["Exception → Decision","break","IH","30-Sep-26","Exception → decision cockpit"],
+["Decision → Action","break","IH","30-Sep-26","Decision/action register"],
+["Action → Outcome → Learning","break","IH","30-Sep-26","Outcome tracking"]
 ];
 const sgt=document.getElementById("sched-gap-tbody");
 SCHED_GAP.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td class="mono">${r[0]}</td><td><b>${r[1]}</b></td><td>${r[2]}</td><td>${r[3]}</td><td class="ev">${r[4]}</td><td><span class="tag ${r[5]==='P0'?'t-crit':r[5]==='P1'?'t-high':'t-med'}">${r[5]}</span></td>`;sgt.appendChild(tr);});
