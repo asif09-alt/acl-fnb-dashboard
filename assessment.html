@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AKIJ Commodities Ltd. — Food & Beverage Strategic System Assessment (PC 818 / WH 10738)</title>
+<style>
+:root{
+  --ink:#090c11; --panel:#12161e; --panel2:#181e29; --rule:#262e3b; --rule-soft:#1c2330;
+  --gold:#3f7fe0; --gold-lt:#7aabf2; --text:#eef1f6; --muted:#8d99ab; --faint:#5f6b7d;
+  --pos:#3fb37f; --neg:#dc5c53; --warn:#d99a3d; --cool:#5b8bb5;
+  --display:"Fraunces",Georgia,"Times New Roman",serif;
+  --body:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1100px 620px at 78% -12%, #16202e 0%, transparent 62%),
+    radial-gradient(900px 500px at 4% 108%, #11161f 0%, transparent 58%),
+    var(--ink);
+  color:var(--text); font-family:var(--body); font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1380px;margin:0 auto;padding:40px 26px 90px}
+.mast{border-bottom:1px solid var(--rule);padding-bottom:26px;margin-bottom:34px}
+.brandmark{display:flex;align-items:center;gap:8px;margin:0 0 18px}
+.brandmark span{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.04em;color:var(--text)}
+.brandmark .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin:0 0 14px}
+.mast h1{font-family:var(--display);font-weight:300;font-size:clamp(28px,4.4vw,48px);line-height:1.04;margin:0 0 12px;letter-spacing:-.015em}
+.mast h1 em{font-style:normal;font-weight:700;color:var(--gold-lt)}
+.standfirst{max-width:78ch;color:var(--muted);margin:0;font-size:15.5px}
+.srcline{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-top:14px}
+.chiprow{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--muted);border:1px solid var(--rule);padding:5px 11px;border-radius:20px;background:var(--panel)}
+.chip b{color:var(--text)}
+
+nav{position:sticky;top:0;z-index:40;background:rgba(9,12,17,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);margin-bottom:34px}
+nav .inner{max-width:1380px;margin:0 auto;padding:12px 26px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+nav button{background:none;border:1px solid transparent;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:7px 12px;border-radius:3px;cursor:pointer;transition:.15s}
+nav button:hover{color:var(--text);border-color:var(--rule)}
+nav button.active{color:var(--gold);border-color:var(--gold);background:rgba(63,127,224,.08)}
+
+section{display:none;animation:fade .3s ease}
+section.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.sec-head{margin:0 0 22px}
+.sec-head h2{font-family:var(--display);font-weight:600;font-size:26px;margin:0 0 6px}
+.sec-head p{color:var(--muted);margin:0;max-width:85ch}
+
+.gauges{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:24px 0}
+.gauge{background:linear-gradient(160deg,var(--panel2) 0%,var(--panel) 70%);border:1px solid var(--rule);border-radius:3px;padding:18px;position:relative;overflow:hidden}
+.gauge::after{content:"";position:absolute;inset:0 auto 0 0;width:2px;background:var(--gold);opacity:.7}
+.gname{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 0 7px}
+.gvalue{font-family:var(--display);font-weight:700;font-size:25px;color:var(--text);margin:0}
+.gsub{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:5px}
+.gv.pos{color:var(--pos)} .gv.neg{color:var(--neg)} .gv.warn{color:var(--warn)}
+
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:16px}
+.card{background:linear-gradient(160deg,var(--panel2) 0%,var(--panel) 70%);border:1px solid var(--rule);border-radius:3px;padding:20px;margin-bottom:16px}
+.card h3{margin:0 0 12px;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-lt)}
+.card p{margin:0 0 10px;color:var(--muted);font-size:14px}
+.card ul{margin:0 0 10px;padding-left:18px;color:var(--muted);font-size:14px}
+.card li{margin-bottom:6px}
+.card .note{font-family:var(--mono);font-size:11.5px;color:var(--faint);border-top:1px solid var(--rule-soft);padding-top:10px;margin-top:10px}
+.tag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.08em;padding:3px 8px;border-radius:3px;margin:2px 4px 2px 0;text-transform:uppercase}
+.t-crit{background:rgba(220,92,83,.14);color:#e98a83;border:1px solid rgba(220,92,83,.35)}
+.t-high{background:rgba(217,154,61,.12);color:#e6b06a;border:1px solid rgba(217,154,61,.35)}
+.t-med{background:rgba(91,139,181,.12);color:#8db6dd;border:1px solid rgba(91,139,181,.35)}
+.t-low{background:rgba(63,179,127,.12);color:#74cfa8;border:1px solid rgba(63,179,127,.35)}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+thead th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);position:sticky;top:0;background:var(--panel)}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--rule-soft);vertical-align:top;color:var(--muted)}
+tbody tr:hover td{background:rgba(63,127,224,.05)}
+td b{color:var(--text)}
+.table-scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--panel);max-height:640px;overflow-y:auto}
+.mono{font-family:var(--mono);font-size:12px}
+.scorebar{display:flex;align-items:center;gap:8px}
+.sb-track{flex:1;height:8px;background:#0d1219;border:1px solid var(--rule);border-radius:4px;overflow:hidden;display:flex}
+.sb-fill{height:100%}
+.sb-cur{background:linear-gradient(90deg,#3f7fe0,#7aabf2)}
+.sb-target{background:rgba(63,179,127,.5)}
+.sb-label{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap}
+
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.flow-step{background:var(--panel2);border:1px solid var(--rule);border-radius:3px;padding:7px 11px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.flow-step.on{color:var(--pos);border-color:rgba(63,179,127,.4)}
+.flow-step.off{color:var(--faint);border-color:var(--rule);opacity:.75}
+.flow-step.miss{border-color:rgba(220,92,83,.4);color:#e98a83}
+.flow-arrow{color:var(--faint);font-size:11px}
+
+.chain{border:1px solid var(--rule);border-radius:3px;margin-bottom:10px;background:var(--panel)}
+.chain-head{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;cursor:pointer}
+.chain-head .chain-name{font-family:var(--mono);font-size:12px;letter-spacing:.05em;color:var(--text)}
+.chain-head .chain-status{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em}
+.chain-body{padding:0 14px 14px;display:none}
+.chain.open .chain-body{display:block}
+.chain-body p{margin:4px 0;font-size:13.5px;color:var(--muted)}
+.chain-body .fix{color:var(--pos);font-size:13px;margin-top:8px}
+.s-green{color:var(--pos)} .s-red{color:var(--neg)} .s-yellow{color:var(--warn)} .s-grey{color:var(--faint)}
+
+.radar-list{list-style:none;margin:0;padding:0}
+.radar-list li{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.radar-list .rl-name{flex:1;font-size:13.5px;color:var(--muted)}
+.radar-list .rl-name b{color:var(--text)}
+.radar-track{width:110px;height:7px;background:#0d1219;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.radar-fill{height:100%}
+
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:4px 10px;border-radius:20px;border:1px solid var(--rule);color:var(--muted);margin:3px 5px 3px 0}
+.pill.on{color:var(--pos);border-color:rgba(63,179,127,.45);background:rgba(63,179,127,.08)}
+.pill.wait{color:var(--warn);border-color:rgba(217,154,61,.45);background:rgba(217,154,61,.08)}
+.pill.no{color:var(--neg);border-color:rgba(220,92,83,.45);background:rgba(220,92,83,.08)}
+
+.filterbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.filterbar button{background:var(--panel2);border:1px solid var(--rule);color:var(--muted);font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:6px 11px;border-radius:3px;cursor:pointer}
+.filterbar button.active{color:var(--gold);border-color:var(--gold)}
+
+.road{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:20px 0}
+.road .phase{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--rule);border-top:2px solid var(--gold);border-radius:3px;padding:18px}
+.road .phase h3{margin:0 0 4px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--gold)}
+.road .phase .time{font-family:var(--display);font-size:20px;font-weight:700;margin:0 0 10px}
+.road .phase ul{margin:0;padding-left:16px;color:var(--muted);font-size:13px}
+.road .phase li{margin-bottom:5px}
+.verdict{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--rule);border-left:3px solid var(--gold);border-radius:3px;padding:20px;margin-bottom:16px}
+.verdict h3{margin:0 0 8px;font-family:var(--display);font-weight:700;font-size:18px}
+.verdict p{margin:0;color:var(--muted);font-size:14.5px}
+.ev{font-family:var(--mono);font-size:11.5px;color:var(--faint);word-break:break-word}
+</style>
+</head>
+<body>
+
+<nav><div class="inner" id="nav"></div></nav>
+
+<div class="wrap">
+
+<!-- MASTHEAD -->
+<div class="mast">
+  <div class="brandmark"><span class="dot"></span><span>AKIJ RESOURCE · BUSINESS SECRETARY</span></div>
+  <p class="eyebrow">Read-Only Systems Assessment · F&amp;B Scope · Evidence-Based</p>
+  <h1>AKIJ COMMODITIES LTD.<br><em>Food &amp; Beverage Profit Center — Strategic Management System</em></h1>
+  <p class="standfirst">A live trading/import ERP (iBOS, BU 221) that transacts — items, PR/PO/LC, goods receipt, warehouse, sales order → delivery → invoice, finance journals — but the <b style="color:var(--text)">food &amp; beverage strategic core is absent</b>: no batch/expiry, no true landed cost, no quality, no traceability, no contribution, no channels, no forecast. Systemically, the F&amp;B profit center measures nothing below gross revenue.</p>
+  <p class="srcline">BASED ON · live <b>iBOSDDD</b> ERP data (read-only) · <b>DWH</b> finance model · iBOS dev tracker AERP-409 · 2026-08-25 · SCOPE: PC 818 / WH 10738 · Fruits &amp; Dates EXCLUDED</p>
+  <div class="chiprow">
+    <span class="chip">MODE <b>READ-ONLY AUDIT</b></span>
+    <span class="chip">PROFIT CENTER <b>818 · F&amp;B</b></span>
+    <span class="chip">WAREHOUSE <b>10738 · DRY FOOD</b></span>
+    <span class="chip">CAPABILITY <b>~12% COMPLETE</b></span>
+    <span class="chip">WORKSPACES <b>45 SCORED</b></span>
+    <span class="chip">AVG MATURITY <b>1.0 / 5</b></span>
+  </div>
+</div>
+
+<!-- ===================== SECTION: VERDICT ===================== -->
+<section id="sec-verdict">
+  <div class="sec-head"><h2>Executive Verdict</h2>
+    <p>What the Food &amp; Beverage profit center actually has today, and what it must become.</p></div>
+
+  <div class="verdict">
+    <h3>Q1 — What system does F&amp;B have today?</h3>
+    <p>A live <b style="color:var(--text)">Trading ERP / import-LC transaction system</b> (group iBOS) with a working procurement→import→warehouse→sales→journal spine and an off-ERP finance/DWH decision layer. It is <b style="color:var(--text)">not</b> an import-management system (shipment/landed-cost modules exist but are BU-wide and bulk-dominated), <b style="color:var(--text)">not</b> a distribution system (RTM unused by ACL), <b style="color:var(--text)">not</b> an FMCG system, and not a strategic or decision-intelligence system.</p>
+  </div>
+
+  <div class="gauges">
+    <div class="gauge"><p class="gname">F&amp;B Revenue FY26 YTD</p><p class="gvalue">BDT 2.26 Cr</p><p class="gsub">PC 818 · Jul–Aug 2026 · journal-verified</p></div>
+    <div class="gauge"><p class="gname">F&amp;B COGS FY26 YTD</p><p class="gvalue">BDT 2.21 Cr</p><p class="gsub">PC 818 · Jul–Aug 2026</p></div>
+    <div class="gauge"><p class="gname">Gross Margin FYTD</p><p class="gvalue gv pos">+2.2%</p><p class="gsub">MTD Aug 2026 −5.6% (negative)</p></div>
+    <div class="gauge"><p class="gname">WH 10738 Stock</p><p class="gvalue">BDT 3.40 Cr</p><p class="gsub">119,299 units · 253 SKUs · ledger net</p></div>
+    <div class="gauge"><p class="gname">Import LCs (BU 221)</p><p class="gvalue gv warn">BDT 535.7 Cr</p><p class="gsub">162 LCs · 40 open · F&amp;B subset 9 LCs</p></div>
+    <div class="gauge"><p class="gname">Batch / Expiry</p><p class="gvalue gv neg">0 / 748</p><p class="gsub">no batch table · no expiry flags</p></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Q3 — Capability mix vs target</h3>
+      <div class="scorebar" style="margin:6px 0"><div class="sb-track"><div class="sb-fill sb-cur" style="width:12%"></div></div><span class="sb-label">Complete ≈ 12%</span></div>
+      <div class="scorebar" style="margin:6px 0"><div class="sb-track"><div class="sb-fill sb-cur" style="width:30%"></div></div><span class="sb-label">Partial ≈ 30%</span></div>
+      <div class="scorebar" style="margin:6px 0"><div class="sb-track"><div class="sb-fill sb-cur" style="width:58%;background:#dc5c53"></div></div><span class="sb-label">Missing ≈ 58%</span></div>
+      <p style="margin-top:14px">Maturity scale: 0 Missing · 1 Ad hoc · 2 Basic · 3 Systemized · 4 Integrated · 5 Intelligent.</p>
+    </div>
+    <div class="card">
+      <h3>Why F&amp;B margin is unreliable</h3>
+      <ul>
+        <li>WH 10738 physical stock ≈ <b style="color:var(--text)">BDT 3.40 Cr</b> (253 F&amp;B SKUs) is <b>NOT on the books</b> — PC 818 Finished-Goods GL shows only 0.80M (2 rows, incomplete posting).</li>
+        <li>Purchases are expensed to COGS at GRN without inventory capitalization → COGS overstated, GM distorted.</li>
+        <li>True landed cost (duty / FX / freight / C&amp;F / port) is <b>not captured at SKU level</b> — costing tables exist (6,744 rows BU-wide) but are bulk-commodity dominated and not F&amp;B-isolable.</li>
+      </ul>
+      <div class="note">Fix order: inventory valuation &amp; reconciliation → landed cost → contribution → pricing.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Q5 — Ten biggest technical gaps (F&amp;B scope)</h3>
+    <div class="flow" id="techgap-flow"></div>
+    <div class="note">Q4 business gaps · Q6 data gaps · Q7 control/food-safety gaps · Q8 UX gaps — see <b>Gap Register</b> tab (filterable).</div>
+  </div>
+</section>
+
+<!-- ===================== SECTION: SCORECARD ===================== -->
+<section id="sec-score">
+  <div class="sec-head"><h2>Workspace Scorecard — 45 Workspaces (0–5)</h2>
+    <p>Every workspace of the Food &amp; Beverage management loop scored for today's capability vs the 5.0 target. Ranked weakest → strongest. Click a row for detail.</p></div>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>#</th><th>Workspace</th><th>Current</th><th>Capability bar</th><th>Gap</th><th>Severity</th><th>Priority</th><th>Evidence</th></tr></thead>
+      <tbody id="score-tbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== SECTION: GAP REGISTER ===================== -->
+<section id="sec-gaps">
+  <div class="sec-head"><h2>Master Gap Register</h2>
+    <p>Prioritized by financial impact, risk and working-capital effect — not feature attractiveness. Filter by priority band.</p></div>
+  <div class="filterbar" id="gap-filter">
+    <button data-f="all" class="active">All</button>
+    <button data-f="P0">P0 Foundation</button>
+    <button data-f="P1">P1 Core</button>
+    <button data-f="P2">P2 Commercial</button>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>ID</th><th>Workspace</th><th>Gap</th><th>Evidence</th><th>Business / Financial impact</th><th>Risk</th><th>Pri</th></tr></thead>
+      <tbody id="gap-tbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== SECTION: CHAINS ===================== -->
+<section id="sec-chains">
+  <div class="sec-head"><h2>Broken Business Chains</h2>
+    <p>Every connection in the Food &amp; Beverage loop tested end-to-end against the live data model. <span class="s-green">● intact</span> <span class="s-yellow">● partial</span> <span class="s-red">● broken</span>. Expand each chain for the technical cause, consequence and fix.</p></div>
+  <div id="chain-list"></div>
+
+  <div class="card" style="margin-top:18px">
+    <h3>Intact transaction spine (works — do NOT rebuild)</h3>
+    <div class="flow" id="intact-flow"></div>
+    <p style="margin-top:12px;font-size:13.5px">PR → PO → LC → GRN → WMS (receive/issue/transfer/adjust) → Sales Order → Delivery Order → Invoice → Journal — all live with audit and approval. Reusable group assets: RTM distribution suite (live for AEL/ALEL/AFBL), approval engine, RBAC, audit log, DWH finance layer.</p>
+  </div>
+</section>
+
+<!-- ===================== SECTION: FINANCE ===================== -->
+<section id="sec-fin">
+  <div class="sec-head"><h2>Financial &amp; Working Capital Picture — F&amp;B (PC 818)</h2>
+    <p>Verified from ERP journals (fin.tblAccountingJournalArc, intProfitCenterId=818) reconciled to the DWH finance model. PC 818 data begins 2026-06-30; historical FY25-26 F&amp;B is NOT isolable from BU-wide figures.</p></div>
+
+  <div class="gauges">
+    <div class="gauge"><p class="gname">F&amp;B Revenue FY26 YTD</p><p class="gvalue">22.6 M</p><p class="gsub">Jul 16.78 M · Aug MTD 5.86 M</p></div>
+    <div class="gauge"><p class="gname">F&amp;B COGS FYTD</p><p class="gvalue gv neg">22.1 M</p><p class="gsub">Aug MTD COGS 6.19 M &gt; revenue</p></div>
+    <div class="gauge"><p class="gname">Gross Margin FYTD</p><p class="gvalue gv pos">+2.2%</p><p class="gsub">Jul +5.0% · Aug MTD −5.6%</p></div>
+    <div class="gauge"><p class="gname">WH 10738 Stock</p><p class="gvalue">33.99 M</p><p class="gsub">119,299 units · 253 SKUs · ledger net</p></div>
+    <div class="gauge"><p class="gname">GL Book Value (PC 818)</p><p class="gvalue gv neg">0.80 M</p><p class="gsub">2 rows only — posting incomplete</p></div>
+    <div class="gauge"><p class="gname">Receivables Aging</p><p class="gvalue gv neg">UNRELIABLE</p><p class="gsub">0/325 deliveries marked paid</p></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Profit &amp; Loss trend (PC 818, BDT M)</h3>
+      <table>
+        <thead><tr><th>Period</th><th>Revenue</th><th>COGS</th><th>GM %</th><th>Net Profit</th></tr></thead>
+        <tbody>
+          <tr><td>FY26 YTD (Jul–Aug)</td><td>22.6</td><td>22.1</td><td class="s-green">+2.2%</td><td class="s-red">−1.4</td></tr>
+          <tr><td>Jul 2026</td><td>16.8</td><td>15.9</td><td class="s-green">+5.0%</td><td class="s-red">−0.6</td></tr>
+          <tr><td>Aug 2026 (MTD 25)</td><td>5.9</td><td>6.2</td><td class="s-red">−5.6%</td><td class="s-red">−0.8</td></tr>
+        </tbody>
+      </table>
+      <div class="note">Structural thin/negative GM, worsening in Aug. Cannot be decomposed — no landed cost, no category P&amp;L, no contribution.</div>
+    </div>
+    <div class="card">
+      <h3>Where working capital is trapped / unmeasured (F&amp;B)</h3>
+      <ul>
+        <li><b style="color:var(--text)">Unbooked inventory</b> ≈ 33.2 M (WH 10738 ledger vs GL 0.80 M)</li>
+        <li><b style="color:var(--text)">Perishable risk</b> — Milk 8.49 M + Canned 6.39 M + Beverage 6.24 M with no batch/expiry discipline</li>
+        <li><b style="color:var(--text)">Import pipeline</b> — 162 LCs / 5,356 M drawdown (BU-wide); F&amp;B subset 9 LCs / 51.7 M, 2 open = 15.5 M</li>
+        <li><b style="color:var(--text)">Receivables</b> — 325 deliveries / 128.07 M cumulative delivered; aging unreliable (payment flag unmaintained)</li>
+        <li><b style="color:var(--text)">Collections Aug MTD</b> — 8.06 M collected (21 F&amp;B customers, name-based)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>WH 10738 stock value by category (F&amp;B, ledger net — BDT M)</h3>
+    <div class="radar-list" id="cat-cost-list"></div>
+    <div class="note">Fruits &amp; Dates EXCLUDED (out of F&amp;B scope). True SKU contribution is unmeasurable today.</div>
+  </div>
+</section>
+
+<!-- ===================== SECTION: COMMERCE ===================== -->
+<section id="sec-com">
+  <div class="sec-head"><h2>Commerce — Categories, Brands, Customers, Suppliers, Imports</h2>
+    <p>What the live master data actually contains (F&amp;B scope).</p></div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>AKIJ OASIS portfolio (evidence: itm.tblItem)</h3>
+      <ul>
+        <li><b style="color:var(--text)">Canned food (12 SKUs)</b> — tuna chunk/flakes in brine/oil/water, whole mushroom 400g/2840g, green peas, sweet corn</li>
+        <li><b style="color:var(--text)">FG date packs (9)</b> — Ajwa Premium 3kg, Dabbas 10kg, Lulu 10kg, Mabroom 3kg, Mashrook VIP 5kg, Nagal 10kg, Safawi Premium 5kg, Sukkari 3kg, Zahedi Box 10kg — via in-house repacking (PROD-ACL-* shop-floor orders, Mar–Apr 2026) — <b style="color:var(--warn)">DATES: EXCLUDED from F&amp;B scope</b></li>
+      </ul>
+      <div class="note">OASIS is a string inside item names — no brand object, no brand P&amp;L, no brand management.</div>
+    </div>
+    <div class="card">
+      <h3>F&amp;B category spread (WH 10738, 253 SKUs)</h3>
+      <p>MILK 8.49 M · Canned Food 6.39 M · Beverage &amp; Drinking 6.24 M · Snacks 2.51 M · Sauce &amp; Spread 2.43 M · Baking 2.34 M · Cereal 1.52 M · Oil 0.34 M · Honey (Trading Goods) 0.74 M — by stock value.</p>
+      <div class="note">No category master / hierarchy — typo categories exist. Fruits &amp; Dates categories excluded from this dashboard.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Import origins — 162 LCs · BDT 5,356 M (BU 221, At Sight, USD @ ~123)</h3>
+    <div class="radar-list" id="origin-list"></div>
+    <div class="note">Russia &amp; South Africa dominate — but these are bulk commodities (wheat/peas/fruits) OUT of F&amp;B scope. F&amp;B-specific LCs (Ready Food / Canned Tuna / Chicken Powder) = 9 LCs / BDT 51.7 M. Best true sourcing economics unmeasurable — no landed cost / quality / lead-time data.</div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Customers (F&amp;B, WH 10738) — B2B trader mix</h3>
+      <ul>
+        <li>Import-trade enterprises: DIVINE TRADE (38.2 M delivered), ORGANIC TRADE (23.9 M), EVEREST TRADE (9.4 M), 5A BUSINESS CENTER (6.8 M), M/S AFNAN (4.9 M)</li>
+        <li>53 F&amp;B customers · 325 deliveries · BDT 128.07 M cumulative delivered (Oct-2025 → Aug-2026)</li>
+        <li>Fruit wholesalers (Mayabi Fruits, Ayman Fruits, AL-BAITULLAH) — <b style="color:var(--warn)">EXCLUDED from F&amp;B scope</b></li>
+      </ul>
+      <div class="note">No channels, territories, sales force, credit limits, or customer 360.</div>
+    </div>
+    <div class="card">
+      <h3>Suppliers &amp; warehouse network</h3>
+      <ul>
+        <li>No supplier scorecard (price/quality/reliability/lead-time/terms)</li>
+        <li>Warehouses: ACL Dry Food (100 Feet, WH 10738), Central Warehouse + 4 third-party cold stores — Baro Awlia (CTG), Star Multipurpose, Dhaka Cold Storage, Agroo Cold Chain (Tejgaon)</li>
+      </ul>
+      <div class="note">Cold-chain temperature / receiving temp / shrink are not recorded anywhere.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SECTION: AI ===================== -->
+<section id="sec-ai">
+  <div class="sec-head"><h2>AI &amp; Decision Intelligence Readiness</h2>
+    <p>Foundations must be reliable before governed agents. Every agent is recommend-only with human approval.</p></div>
+
+  <div class="radar-list" id="ai-dims"></div>
+
+  <div class="card" style="margin-top:18px">
+    <h3>Agent classification</h3>
+    <p style="margin-bottom:8px"><b style="color:var(--text)">Ready now —</b> <span class="pill no">none safely</span></p>
+    <p style="margin-bottom:8px"><b style="color:var(--text)">Ready after P0/P1 foundation work —</b>
+      <span class="pill wait">Expiry / Shelf-Life</span><span class="pill wait">Landed-Cost</span><span class="pill wait">Inventory Exception</span><span class="pill wait">Working Capital</span><span class="pill wait">Profitability</span><span class="pill wait">Demand Forecast</span></p>
+    <p><b style="color:var(--text)">Not recommended yet —</b>
+      <span class="pill no">Pricing</span><span class="pill no">Procurement Commit</span><span class="pill no">Promotion</span><span class="pill no">Recall / Crisis</span><span class="pill no">Strategy</span><span class="pill no">Autonomous Collection</span></p>
+  </div>
+</section>
+
+<!-- ===================== SECTION: ROADMAP ===================== -->
+<section id="sec-road">
+  <div class="sec-head"><h2>Roadmap — Foundations before AI</h2>
+    <p>P0 fixes the data &amp; control spine; P1–P2 build commercial management; P3+ add decision intelligence and governed AI.</p></div>
+
+  <div class="road">
+    <div class="phase"><h3>P0 · FOUNDATION</h3><p class="time">0–6 months</p><ul>
+      <li>F&amp;B masters: category / brand / profit-center / COO / barcode</li>
+      <li><b>Batch + expiry at GRN</b> (enforce for all food SKUs)</li>
+      <li>Quality hold → release workflow</li>
+      <li><b>True landed cost</b> (shipment → charges → SKU)</li>
+      <li>Inventory GL valuation &amp; ERP↔GL reconciliation</li>
+      <li>AR subledger + credit limits + collections</li>
+      <li>Pricing rules with margin floor + approval</li>
+      <li>RBAC / SoD / approval matrix · audit depth · data cleansing</li></ul></div>
+    <div class="phase"><h3>P1 · CORE F&amp;B</h3><p class="time">6–12 months</p><ul>
+      <li>Import shipment lifecycle (ETD/ETA/ATA, container, demurrage)</li>
+      <li>Regulatory / permits / COO / health certs</li>
+      <li>Supplier scorecard</li>
+      <li>Collections &amp; credit control</li>
+      <li>Sales force + RTM onboarding (field sales)</li>
+      <li>HORECA module (lead → trial → listing → repeat)</li>
+      <li>Warehouse FEFO / locations · returns &amp; reasons</li></ul></div>
+    <div class="phase"><h3>P2 · COMMERCIAL</h3><p class="time">12–18 months</p><ul>
+      <li>Category &amp; brand management dashboards</li>
+      <li>S&amp;OP (demand / supply / inventory / cash)</li>
+      <li>Channel management · distributor hierarchy</li>
+      <li>Trade promotions with ROI economics</li>
+      <li><b>True contribution</b> per SKU / customer / channel</li>
+      <li>Customer 360</li></ul></div>
+    <div class="phase"><h3>P3 · DECISION INTELLIGENCE</h3><p class="time">18–24 months</p><ul>
+      <li>Exception / early-warning engine (40+ rules)</li>
+      <li>Expiry intelligence &amp; demand diagnostics</li>
+      <li>Contribution analytics</li>
+      <li>Management-decision cockpit: Exception → Root Cause → Impact → Decision → Action</li></ul></div>
+    <div class="phase"><h3>P4 · GOVERNED AI</h3><p class="time">24+ months</p><ul>
+      <li>Agents: demand, procurement, inventory, shelf-life, pricing (recommend-only), customers, working capital</li>
+      <li>Human approval on every ERP action</li>
+      <li>Audit trail + outcome + learning loop</li></ul></div>
+    <div class="phase"><h3>P5 · ADAPTIVE F&amp;B</h3><p class="time">24+ months</p><ul>
+      <li>Continuous market sensing</li>
+      <li>Dynamic forecasting &amp; allocation</li>
+      <li>Optimized working capital</li>
+      <li>Closed-loop strategic learning</li></ul></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>3 / 6 / 12 / 24 months</h3>
+      <ul>
+        <li><b style="color:var(--text)">3 mo</b> — masters, batch+expiry, GL reconciliation, aging report, landed-cost config</li>
+        <li><b style="color:var(--text)">6 mo</b> — import shipment, quality gate, AR subledger, pricing, sales-force start</li>
+        <li><b style="color:var(--text)">12 mo</b> — category/brand/channel, S&amp;OP, contribution, exception cockpit</li>
+        <li><b style="color:var(--text)">24 mo</b> — governed AI-assisted adaptive F&amp;B management</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Five foundational changes that unlock the most value</h3>
+      <ul>
+        <li>1 · Batch + expiry discipline</li>
+        <li>2 · True landed cost per SKU</li>
+        <li>3 · Inventory GL valuation &amp; reconciliation</li>
+        <li>4 · AR subledger + credit limits</li>
+        <li>5 · F&amp;B master data (category / brand / profit center)</li>
+      </ul>
+      <div class="note">Everything else — pricing, S&amp;OP, profitability, AI — compounds on these.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SECTION: EVIDENCE ===================== -->
+<section id="sec-ev">
+  <div class="sec-head"><h2>Evidence Base &amp; Data Inventory</h2>
+    <p>All key objects verified in the live iBOSDDD schema/data and DWH. Confidence: schema/data = Verified; frontend/API internals = Medium (no local repo); every “missing” capability was checked for synonyms and alternative modules first.</p></div>
+
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Object</th><th>Status (live rows)</th><th>Table / evidence</th><th>Confidence</th></tr></thead>
+      <tbody id="ev-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="grid2" style="margin-top:16px">
+    <div class="card">
+      <h3>Development tracker — iBOS ERP (project AERP-409)</h3>
+      <ul>
+        <li>751 tasks · 79.6% done · <b style="color:var(--neg)">203 overdue</b> · 139 backlog · 4 QA-failed</li>
+        <li>F&amp;B-related tasks found: <b style="color:var(--text)">1</b> — “Expiry Date Management for Imported Items” (AERP-161, Done)</li>
+        <li>No tasks for Landed Cost · Batch · Traceability · Forecast · HORECA · Recall</li>
+      </ul>
+      <div class="note">Confirms F&amp;B strategic capabilities were never built — expiry feature exists but batch table is empty.</div>
+    </div>
+    <div class="card">
+      <h3>RTM distribution suite — available, not used by ACL</h3>
+      <ul>
+        <li><span class="s-green">●</span> BU 144 (AEL) — 1,253,459 outlet deliveries · 196,676 outlets</li>
+        <li><span class="s-green">●</span> BU 237 (ALEL) — 214,235 · 86,968 · BU 172 (AFBL) — 10,573 · BU 4 (ACCL) — 19,557</li>
+        <li><span class="s-red">○</span> BU 221 (ACL) — <b style="color:var(--text)">0</b> outlet deliveries / 0 outlets</li>
+      </ul>
+      <div class="note">Routes, route plans, check-in/out, secondary-sales config, damage/claims, retail pricing, IMS forecast — all ready for ACL onboarding.</div>
+    </div>
+  </div>
+
+  <p class="ev" style="margin-top:20px">Deliverable: ACL_FB_System_Dashboard_FNB.html · Generated 2026-08-25 · Read-only · No application, database, schema or data modified. Scope: SBU 221 / PC 818 / WH 10738 — Fruits &amp; Dates EXCLUDED.</p>
+</section>
+
+</div>
+
+<script>
+const NAV=[["verdict","Verdict"],["score","Scorecard"],["gaps","Gap Register"],["chains","Chains"],["fin","Finance & Cash"],["com","Commerce"],["ai","AI Readiness"],["road","Roadmap"],["ev","Evidence"]];
+
+// ---------- WORKSPACES (F&B-scoped evidence) ----------
+const WS=[
+[1,"PC Executive Command Center",1,"finance reports only; no exception→decision cockpit","Critical","P0","fin.tblAccountingJournalArc PC 818 + DWH"],
+[2,"Market & Consumer Intelligence",0,"no market/trend/competitor objects","High","P0","oms.tblCompetitor* unused"],
+[3,"Strategy Management",0,"no strategy/objective/initiative objects","High","P0","none in schema for ACL"],
+[4,"Category Management",1,"text categories; no hierarchy/analysis","High","P0","itm.tblItemArc.strItemCategoryName"],
+[5,"Brand Management",1,"brand only inside item names","High","P0","itm.tblItemArc (no brand col)"],
+[6,"SKU Portfolio Management",2,"253 F&B SKUs in WH 10738; no lifecycle","High","P0","itm.tblItemArc + wms ledger"],
+[7,"NPD / Import Introduction",1,"no structured NPD flow","Medium","P2","none"],
+[8,"Demand Forecasting",0,"no forecast for ACL","High","P0","rtm.tblImsForecast* no ACL rows"],
+[9,"Sales & Operations Planning",0,"no integrated plan","High","P0","none"],
+[10,"International Sourcing & Procurement",2,"PR→PO→LC; no RFQ/scorecard for ACL","High","P0","pro.tblPurchaseOrderHeader 656"],
+[11,"Supplier & Principal Management",1,"master only; no scorecard","High","P0","prt.tblBusinessPartner 273"],
+[12,"Import & Trade Management",2,"LC + shipment tables populated (BU-wide); no F&B isolation","Critical","P0","com.tblImportShipmentHeaderArc 973"],
+[13,"Trade Finance, LC & FX",2,"LC+FX+PI; no maturity/instalments","Medium","P1","com.tblLetterOfCreditArc 162"],
+[14,"True Landed Cost",0,"costing populated BU-wide but not F&B-isolable","Critical","P0","com.tblCommercialCostingArc 6,744"],
+[15,"Food Quality & Food Safety",0,"no inspection/COA/hold tables","Critical","P0","none; QC stock type unused"],
+[16,"Regulatory & Import Compliance",1,"permit tables exist, unused","High","P1","imp.tblImportPermitHeader = 0"],
+[17,"Batch, Lot & Traceability",0,"batch table empty","Critical","P0","wms.tblInventoryBatch = 0"],
+[18,"Expiry & Shelf-Life Management",0,"expiry flag 0/748; no FEFO","Critical","P0","itm.tblItemArc.isRequiredExpireDate"],
+[19,"Fresh Fruit / Cold Chain",1,"4 cold stores text names; no temp","High","P1","wms plant names (out of F&B scope)"],
+[20,"Inventory Management",2,"live WMS ledger (WH 10738); no batch/FEFO/expiry","Critical","P0","wms.tblInventoryTransactionRowArc"],
+[21,"Warehouse Management",2,"receive/issue/transfer/adjust; no location","Medium","P1","wms"],
+[22,"Channel & Route-to-Market",1,"RTM unused by ACL","High","P1","rtm (0 for BU 221)"],
+[23,"Distributor / Dealer Management",0,"dealer module for others only","High","P1","dealer schema, 0 ACL"],
+[24,"Retail & Wholesale Customer Mgmt",2,"master + journals; no 360/aging","High","P0","prt + fin journals"],
+[25,"HORECA & Institutional Sales",1,"few ad-hoc accounts only","Medium","P2","FARS HOTELS & RESORTS etc."],
+[26,"Sales Force Management",0,"no sales force for ACL","High","P1","rtm targets for others only"],
+[27,"Field Sales & Order Capture",0,"no field app for ACL","High","P1","rtm app unused by ACL"],
+[28,"Pricing Management",1,"price setup table empty for BU 221","High","P0","rtm.tblRetailPriceArc 0 for BU 221"],
+[29,"Trade Promotion & Scheme",0,"no offers for ACL","High","P1","itm.tblTradeOfferSetupHeader = 0"],
+[30,"Order, Allocation & Fulfilment",2,"SO→DO→Issue→Invoice; no credit/FEFO","Medium","P1","oms + wms"],
+[31,"Distribution & Delivery",1,"manual DO; no vehicle/route/OTIF","Medium","P2","wms Issue-for-Delivery 7,221"],
+[32,"Customer Credit & Collection",1,"no credit limits; journals only","High","P0","fin AR header = 0"],
+[33,"Returns, Claims & Reverse",1,"23 sales returns only","Medium","P2","wms Receive-for-Sales-Return"],
+[34,"Food Product Recall",0,"no batch → no recall","Critical","P0","no batch anywhere"],
+[35,"Commercial Profitability",0,"no true contribution","Critical","P0","none"],
+[36,"Working Capital",1,"DWH computes; inventory excluded from GL","Critical","P0","DWH inventory anomaly BU 221"],
+[37,"Business Planning & Forecasting",1,"6 budget headers only","Medium","P1","bgt.tblBudgetIncomeExpenseHeader"],
+[38,"KPI & Performance Management",1,"KPI tables exist; ACL usage unproven","Medium","P1","crm.KPISetup / SalesTarget"],
+[39,"Risk, Compliance & Internal Control",1,"approval engine exists; no risk/KRI","High","P1","dco approval + audit"],
+[40,"Exception & Early-Warning Engine",0,"no rule/event engine for ACL","High","P1","none"],
+[41,"Management Decision & Intervention",0,"no decision objects","High","P1","none"],
+[42,"Strategic Initiative Management",0,"no initiatives","High","P2","none"],
+[43,"Document & Knowledge Management",1,"document tables; not object-linked","Low","P3","dco.tblDocumentList"],
+[44,"AKIJ OASIS Brand Management",1,"12 canned SKUs; no brand object","High","P1","itm items"],
+[45,"AI & Decision Intelligence",0,"none in-ERP; off-ERP DWH layer only","High","P3","BS/DWH ecosystem"]
+];
+
+// ---------- GAPS (F&B-scoped, corrected evidence) ----------
+const GAP=[
+["G-01",14,"True landed cost not computed at SKU level","com.tblCommercialCostingArc populated (6,744 rows BU-wide) but bulk-dominated; GRN uses PO value only","Margin unknowable per F&B SKU; FX/duty leakage invisible; Aug GM −5.6% misread","High","P0"],
+["G-02",17,"No batch/lot/expiry","wms.tblInventoryBatch=0 · isRequiredExpireDate 0/748","No FEFO, no expiry alerts, no traceability, recall impossible","Critical","P0"],
+["G-03",15,"No food quality / COA / hold-release","No inspection/COA tables · QC stock type unused","Uninspected goods saleable; quality rejects absorbed silently","Critical","P0"],
+["G-04",20,"Inventory not valued in books","WH 10738 ledger 33.99 M vs PC 818 GL 0.80 M (2 rows)","Balance sheet distorted; COGS overstated; margins unreliable","Critical","P0"],
+["G-05",12,"Import shipment tracking not F&B-isolable","com.tblImportShipmentHeaderArc 973 (BU-wide); no PC field","No F&B ETD/ETA/ATA, no container/demurrage/detention control","High","P0"],
+["G-06",35,"True contribution unknowable","No landed cost + no discounts + no costing/PC","Management cannot see which SKUs destroy value","High","P0"],
+["G-07",1,"No executive command center","No exception→root-cause→impact→decision flow","CEO sees historical P&L only; decisions delayed","High","P0"],
+["G-08",32,"No credit / collection subledger","fin.tblAccountReceivablePayableHeader=0 · payment flag unmaintained (0/325)","No customer aging, credit limits, overdue control","High","P0"],
+["G-09",22,"No channels / distributors","RTM unused by ACL · no channel master","No route-to-market or secondary-sales visibility","High","P1"],
+["G-10",44,"AKIJ OASIS not a brand object","12 canned SKUs as plain items","Brand cannot be managed (revenue/margin/penetration)","High","P1"],
+["G-11",8,"No demand forecast / S&OP","rtm.tblImsForecast* no ACL rows","Blind buying → stockouts/overstock; capital trapped","High","P1"],
+["G-12",28,"No pricing rules","rtm.tblRetailPriceArc 0 for BU 221","Prices set ad hoc; negative-margin SKUs sold knowingly","High","P0"],
+["G-13",13,"FX / LC cost not analyzed","LC FX present; no maturity/hedging","FX swing risk on 5.36 Bn imports (BU-wide)","Medium","P1"],
+["G-14",16,"Regulatory / permits unused","imp.tblImportPermitHeader=0","Import compliance & regulatory-hold risk","High","P1"],
+["G-15",19,"Cold-chain not managed","4 cold stores as text; no temp/log","Perishable spoilage hidden; no shrink visibility","High","P1"],
+["G-16",26,"No sales force / field sales","RTM unused","No wholesale/HORECA coverage","Medium","P2"],
+["G-17",29,"No promotions","trade offers = 0","No scheme economics / promo ROI","Medium","P2"],
+["G-18",3,"No market / strategy management","no objects","Portfolio decisions ad hoc","High","P2"],
+["G-19",39,"Risk / KRI / control register","none","SoD/fraud/quality risks unmanaged","High","P1"],
+["G-20",45,"AI decision layer","off-ERP DWH only","—","Medium","P3"]
+];
+
+// ---------- CHAINS (F&B-scoped) ----------
+const CHAINS=[
+["Market → Category","break","No market/consumer objects exist (WS2)","Categories chosen without market evidence","Add market-intelligence feed → category strategy"],
+["Category → Brand","break","No brand object — brand lives in item name strings","Cannot manage OASIS / exclusive brands","Brand master + brand→category mapping"],
+["Brand → SKU","partial","itm.tblItemArc has no brand/principal/COO columns","OASIS revenue & margin not isolable","Add brand/principal/COO to item master"],
+["SKU → Demand Forecast","break","No forecast (rtm.tblImsForecast* unused for ACL)","No planned buying","Forecast by SKU + season + promo"],
+["Demand → Procurement","partial","PRs created manually, not from forecast","Buy/import over or under","Link forecast → PR proposal"],
+["Procurement → Import","ok","LC references PO (strPONumber verified)","—","keep"],
+["Import → Landed Cost","partial","Shipment/costing tables populated BU-wide; no F&B isolation","F&B cost of import unknowable","Activate F&B shipment + costing"],
+["Landed Cost → Inventory","break","GRN uses PO value only","Stock undervalued; margin wrong","Capitalize landed cost to stock"],
+["Inventory → Batch","break","wms.tblInventoryBatch=0","No lot identity","Batch at GRN"],
+["Batch → Expiry","break","expiry flag 0/748; no batches","No FEFO / expiry alerts","Expiry + FEFO"],
+["Batch → Customer","break","intBatchId=0 on all transaction rows","No traceability, no recall","Batch pick + issue"],
+["Customer → Sales","partial","SO→DO→Issue→Invoice works; no credit/price validation","Bad-debt & unprofitable sale risk","Credit check + price validation"],
+["Sales → Collection","partial","Collections only inside journals","Aging / overdue invisible","AR subledger + allocation"],
+["SKU → Profitability","break","No contribution model","Value-destroying SKUs invisible","Contribution model"],
+["Inventory → Working Capital","break","Inventory off balance sheet","33.2 M stock unbooked (WH 10738)","Inventory valuation & reconciliation"],
+["Quality → Supplier Performance","break","No quality data","Supplier quality unmeasured","Quality + supplier scorecard"],
+["Complaint → Batch Traceability","break","No batch","Cannot respond to complaints","Batch + complaint link"],
+["Strategy → KPI","break","No strategy objects","No strategic management","Strategy → KPI registry"],
+["KPI → Initiative","break","No initiatives","—","Initiative management"],
+["Exception → Decision","break","No exception engine","Reactive management","Exception → decision cockpit"],
+["Decision → Action","break","No decision/action objects","Decisions lost","Decision/action register"],
+["Action → Outcome → Learning","break","No closed loop","No learning","Outcome tracking"]
+];
+
+// ---------- CAT COST (WH 10738 F&B stock value, BDT M) / ORIGIN / AI / EVIDENCE ----------
+const CATCOST=[["MILK",8.49,"#dc5c53"],["Canned Food",6.39,"#e6b06a"],["Beverage & Drinking",6.24,"#8db6dd"],["Snacks",2.51,"#8db6dd"],["Sauce & Spread",2.43,"#8db6dd"],["Baking",2.34,"#74cfa8"],["Cereal",1.52,"#74cfa8"],["Honey (Trading Goods)",0.74,"#74cfa8"],["Oil",0.34,"#74cfa8"]];
+const ORIGIN=[["Russia",2183],["South Africa",1477],["China",451],["Egypt",308],["Brazil",273],["United Arab Emirates",263],["Burkina Faso",154],["Saudi Arabia",91],["Mali",62],["Cameroon",53]];
+const AIDIM=[["Data readiness (transactional)",3],["Historical data",3],["SKU master readiness",2],["Batch / expiry readiness",0],["Customer data readiness",2],["Supplier data readiness",2],["API readiness",2],["Semantic readiness",1],["Event readiness",0],["Workflow readiness",3],["Permission readiness",3],["Audit readiness",2],["MCP readiness",2],["Agent readiness",1]];
+const EV=[
+["Items / SKUs (BU 221)","748 live · barcodes 0/748","itm.tblItemArc","Verified"],
+["F&B SKUs on hand (WH 10738)","253 · 119,299 units · BDT 33.99 M","wms.tblInventoryTransactionRowArc net","Verified"],
+["Business partners","540 · 273 sup / 239 cust","prt.tblBusinessPartnerArc","Verified"],
+["Purchase orders","656 · 640 approved","pro.tblPurchaseOrderHeaderArc","Verified"],
+["LCs (BU 221)","162 At Sight · 5,356 M BDT · FX ~123 · 40 open","com.tblLetterOfCreditArc","Verified"],
+["F&B-specific LCs","9 (Ready Food / Canned Tuna / Chicken Powder) · 51.7 M · 2 open","com.tblLetterOfCreditArc (name-based)","Medium"],
+["Import shipments (BU 221)","973 headers · 1,347 rows · USD 51.07 M","com.tblImportShipmentHeaderArc","Verified"],
+["Import costing / landed cost","6,744 rows · BDT 12,903 M (BU-wide, bulk-dominated)","com.tblCommercialCostingArc","Verified"],
+["Inventory batch","0","wms.tblInventoryBatch","Verified"],
+["Goods receipts (GRN)","1,392 · PO-linked","wms.tblInventoryTransactionHeaderArc","Verified"],
+["Deliveries issued (WH 10738)","325 · BDT 128.07 M · 53 customers","sms.tblDeliveryHeaderArc","Verified"],
+["Sales orders","2,644 Standard","oms.tblSalesOrderHeaderArc","Verified"],
+["Sales invoices","SINV-ACL series · AIT tracked","oms.tblSalesInvoiceArc","Verified"],
+["Finance journal lines (PC 818)","1,173 rows · begins 2026-06-30","fin.tblAccountingJournalArc","Verified"],
+["AR/AP subledger","0","fin.tblAccountReceivablePayableHeaderArc","Verified"],
+["Price setups (BU 221)","0 (1,135 rows exist for other BUs)","rtm.tblRetailPriceArc","Verified"],
+["Trade offers (ACL)","0","itm.tblTradeOfferSetupHeaderArc","Verified"],
+["RTM outlet deliveries (ACL)","0 · AEL 1.25M / ALEL 214k / AFBL 10.6k","rtm.tblOutletDeliveryHeaderArc","Verified"],
+["Budget headers","6","bgt.tblBudgetIncomeExpenseHeaderArc","Verified"],
+["F&B P&L FY26 YTD (PC 818)","Rev 22.6 M · COGS 22.1 M · GM +2.2% · Aug MTD −5.6%","fin.tblAccountingJournalArc PC 818","Verified"],
+["Development tracker","751 tasks · 79.6% · 203 overdue · 1 F&B task (Expiry, Done)","VPT vw_TaskFullDetails / AERP-409","Verified"]
+];
+
+// ---------- RENDER ----------
+function show(sec){document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));document.getElementById("sec-"+sec).classList.add("active");document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.sec===sec));window.scrollTo({top:0,behavior:"smooth"})}
+const navEl=document.getElementById("nav");
+NAV.forEach(([id,label])=>{const b=document.createElement("button");b.textContent=label;b.dataset.sec=id;b.addEventListener("click",()=>show(id));navEl.appendChild(b);if(id==="verdict")b.classList.add("active");});
+
+// tech gaps flow
+const TECHTECH=["No F&B batch/expiry","No F&B landed cost","No quality module","No AR subledger","No pricing/offer modules","No profit-center config","No forecast / S&OP","RTM not used by ACL","Barcode infrastructure 0","Inventory↔GL data model broken"];
+document.getElementById("techgap-flow").innerHTML=TECHTECH.map((t,i)=>`<span class="flow-step miss">${i+1}. ${t}</span>`).join('<span class="flow-arrow">•</span>');
+
+// intact flow
+const INTACT=["PR","PO","LC","GRN","WMS","SO","DO","Invoice","Journal"];
+document.getElementById("intact-flow").innerHTML=INTACT.map(t=>`<span class="flow-step on">${t}</span>`).join('<span class="flow-arrow">→</span>');
+
+// scorecard table
+const sevT={"Critical":"t-crit","High":"t-high","Medium":"t-med","Low":"t-low"};
+const sevColor={"Critical":"s-red","High":"s-yellow","Medium":"s-yellow","Low":"s-green"};
+const priColor={"P0":"s-red","P1":"s-yellow","P2":"s-green","P3":"s-grey"};
+const stb=document.getElementById("score-tbody");
+WS.slice().sort((a,b)=>a[2]-b[2]).forEach(w=>{
+  const tr=document.createElement("tr");
+  const gap=5-w[2];
+  tr.innerHTML=`<td>${w[0]}</td><td><b>${w[1]}</b></td>
+  <td><span class="mono ${w[2]===0?'s-red':w[2]<=1?'s-yellow':'s-green'}">${w[2].toFixed(0)} / 5</span></td>
+  <td style="min-width:220px"><div class="scorebar"><div class="sb-track"><div class="sb-fill sb-cur" style="width:${w[2]*20}%"></div><div class="sb-fill sb-target" style="width:${(5-w[2])*20}%"></div></div></div></td>
+  <td><span class="mono">${gap.toFixed(0)}</span></td>
+  <td><span class="tag ${sevT[w[5]]}">${w[5]}</span></td>
+  <td><span class="tag ${priColor[w[6]]}">${w[6]}</span></td>
+  <td class="ev">${w[7]}</td>`;
+  stb.appendChild(tr);
+});
+
+// gap register with filter
+let gapFilter="all";
+function renderGaps(){const tb=document.getElementById("gap-tbody");tb.innerHTML="";
+  GAP.filter(g=>gapFilter==="all"||g[6]===gapFilter).forEach(g=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td class="mono">${g[0]}</td><td class="mono">WS ${g[1]}</td><td><b>${g[2]}</b></td>
+    <td class="ev">${g[3]}</td><td>${g[4]}</td>
+    <td><span class="tag ${sevT[g[5]]}">${g[5]}</span></td>
+    <td><span class="tag ${priColor[g[6]]}">${g[6]}</span></td>`;
+    tb.appendChild(tr);
+  });
+}
+document.getElementById("gap-filter").addEventListener("click",e=>{
+  if(e.target.tagName!=="BUTTON")return;gapFilter=e.target.dataset.f;
+  document.querySelectorAll("#gap-filter button").forEach(b=>b.classList.toggle("active",b===e.target));renderGaps();
+});
+renderGaps();
+
+// chains
+const cl=document.getElementById("chain-list");
+CHAINS.forEach(([name,st,cause,cons,fix])=>{
+  const d=document.createElement("div");d.className="chain";
+  const stTxt=st==="ok"?"<span class='s-green'>INTACT</span>":st==="partial"?"<span class='s-yellow'>PARTIAL</span>":"<span class='s-red'>BROKEN</span>";
+  d.innerHTML=`<div class="chain-head"><span class="chain-name">${name}</span><span class="chain-status">${stTxt}</span></div>
+  <div class="chain-body"><p><b style="color:var(--text)">Cause</b> · ${cause}</p><p><b style="color:var(--text)">Consequence</b> · ${cons}</p><p class="fix">▲ Fix · ${fix}</p></div>`;
+  d.querySelector(".chain-head").addEventListener("click",()=>d.classList.toggle("open"));
+  cl.appendChild(d);
+});
+
+// cat cost list (max 8.49)
+const ccl=document.getElementById("cat-cost-list");
+CATCOST.forEach(([n,v,col])=>{const li=document.createElement("li");li.innerHTML=`<span class="rl-name"><b>${n}</b> · ${v.toFixed(2)} M BDT</span><div class="radar-track"><div class="radar-fill" style="width:${(v/8.49)*100}%;background:${col}"></div></div>`;ccl.appendChild(li);});
+
+// origin list (max 2183)
+const ol=document.getElementById("origin-list");
+ORIGIN.forEach(([n,v])=>{const li=document.createElement("li");li.innerHTML=`<span class="rl-name"><b>${n}</b> · ${v.toLocaleString()} M</span><div class="radar-track"><div class="radar-fill" style="width:${(v/2183)*100}%"></div></div>`;ol.appendChild(li);});
+
+// AI dims
+const al=document.getElementById("ai-dims");
+AIDIM.forEach(([n,v])=>{const li=document.createElement("li");li.innerHTML=`<span class="rl-name"><b>${n}</b></span><span class="mono" style="width:30px">${v}/5</span><div class="radar-track"><div class="radar-fill" style="width:${v*20}%;background:${v<=1?'#dc5c53':v<=2?'#d99a3d':'#3fb37f'}"></div></div>`;al.appendChild(li);});
+
+// evidence
+const et=document.getElementById("ev-tbody");
+EV.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td><b>${r[0]}</b></td><td>${r[1]}</td><td class="ev">${r[2]}</td><td><span class="tag ${sevT["Medium"]}">${r[3]}</span></td>`;et.appendChild(tr);});
+
+show("verdict");
+</script>
+</body>
+</html>
