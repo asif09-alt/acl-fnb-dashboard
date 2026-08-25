@@ -335,7 +335,7 @@ td b{color:var(--text)}
     <div class="gauge"><p class="gname">F&amp;B COGS FY26 YTD</p><p class="gvalue">BDT 2.21 Cr</p><p class="gsub">PC 818 · Jul–Aug 2026</p></div>
     <div class="gauge"><p class="gname">Gross Margin FYTD</p><p class="gvalue gv pos">+2.2%</p><p class="gsub">MTD Aug 2026 −5.6% (negative)</p></div>
 <div class="gauge"><p class="gname">WH 10738 Stock</p><p class="gvalue">BDT 3.40 Cr</p><p class="gsub">119,299 units · 253 SKUs · ledger net</p></div>
-    <div class="gauge"><p class="gname">Batch / Expiry</p><p class="gvalue gv neg">0 / 748</p><p class="gsub">no batch table · no expiry flags</p></div>
+    <div class="gauge"><p class="gname">Batch / Expiry</p><p class="gvalue gv warn">Manual</p><p class="gsub">maintained manually — not in ERP</p></div>
   </div>
 
   <div class="grid2">
@@ -443,7 +443,7 @@ td b{color:var(--text)}
       <ul>
         <li><b style="color:var(--text)">Unbooked inventory</b> ≈ 33.2 M (WH 10738 ledger vs GL 0.80 M)</li>
         <li><b style="color:var(--text)">Perishable risk</b> — Milk 8.49 M + Canned 6.39 M + Beverage 6.24 M with no batch/expiry discipline</li>
-        <li><b style="color:var(--text)">Receivables</b> — 325 deliveries / 128.07 M cumulative; aging unreliable (0/325 marked paid)</li>
+<li><b style="color:var(--text)">Receivables</b> — 325 deliveries / 128.07 M cumulative; credit collection in place</li>
         <li><b style="color:var(--text)">Collections Aug MTD</b> — 8.06 M (21 F&amp;B customers)</li>
         <li><b style="color:var(--text)">Gatorade dead stock</b> — 3,822 units / 0% movement, on import hold</li>
       </ul>
@@ -500,7 +500,7 @@ td b{color:var(--text)}
         <li>53 F&amp;B customers · 325 deliveries · BDT 128.07 M cumulative delivered (Oct-2025 → Aug-2026)</li>
         <li>Fruit wholesalers (Mayabi Fruits, Ayman Fruits, AL-BAITULLAH) — <b style="color:var(--warn)">EXCLUDED from F&amp;B scope</b></li>
       </ul>
-      <div class="note">No channels, territories, sales force, credit limits, or customer 360.</div>
+      <div class="note">No channels, territories, or sales force; credit collection in place.</div>
     </div>
     <div class="card">
       <h3>ABP FY26-27 &amp; market position (reference)</h3>
@@ -805,7 +805,7 @@ const WS=[
 [29,"Trade Promotion & Scheme",0,"no offers for ACL","High","P1","itm.tblTradeOfferSetupHeader = 0"],
 [30,"Order, Allocation & Fulfilment",2,"SO→DO→Issue→Invoice; no credit/FEFO","Medium","P1","oms + wms"],
 [31,"Distribution & Delivery",1,"manual DO; no vehicle/route/OTIF","Medium","P2","wms Issue-for-Delivery 7,221"],
-[32,"Customer Credit & Collection",1,"no credit limits; journals only","High","P0","fin AR header = 0"],
+[32,"Customer Credit & Collection",3,"credit collection in place; customer-wise ageing and collection tracking","Medium","P1","credit & collection process + ageing/collection plan"],
 [33,"Returns, Claims & Reverse",1,"23 sales returns only","Medium","P2","wms Receive-for-Sales-Return"],
 [34,"Food Product Recall",0,"no batch → no recall","Critical","P0","no batch anywhere"],
 [35,"Commercial Profitability",0,"no true contribution","Critical","P0","none"],
@@ -828,7 +828,7 @@ const GAP=[
 ["G-05",12,"Import shipment tracking not F&B-isolable","com.tblImportShipmentHeaderArc 973 (BU-wide); no PC field","No F&B ETD/ETA/ATA, no container/demurrage/detention control","High","P0"],
 ["G-06",35,"True contribution unknowable","No landed cost + no discounts + no costing/PC","Management cannot see which SKUs destroy value","High","P0"],
 ["G-07",1,"No executive command center","No exception→root-cause→impact→decision flow","CEO sees historical P&L only; decisions delayed","High","P0"],
-["G-08",32,"No credit / collection subledger","fin.tblAccountReceivablePayableHeader=0 · payment flag unmaintained (0/325)","No customer aging, credit limits, overdue control","High","P0"],
+,
 ["G-09",22,"No channels / distributors","RTM unused by ACL · no channel master","No route-to-market or secondary-sales visibility","High","P1"],
 ["G-10",44,"AKIJ OASIS not a brand object","12 canned SKUs as plain items","Brand cannot be managed (revenue/margin/penetration)","High","P1"],
 ["G-11",8,"No formal S&OP / forecast system","Demand informed by market intelligence (FieldScan survey + DWH sales) but no formal S&OP process","Buying not fully linked to forecast; stock-outs persist","Medium","P1"],
@@ -859,7 +859,7 @@ const CHAINS=[
 ["Batch → Expiry","break","expiry flag 0/748; no batches","No FEFO / expiry alerts","Expiry + FEFO"],
 ["Batch → Customer","break","intBatchId=0 on all transaction rows","No traceability, no recall","Batch pick + issue"],
 ["Customer → Sales","partial","SO→DO→Issue→Invoice works; no credit/price validation","Bad-debt & unprofitable sale risk","Credit check + price validation"],
-["Sales → Collection","partial","Collections only inside journals","Aging / overdue invisible","AR subledger + allocation"],
+["Sales → Collection","ok","Credit collection in place; customer-wise ageing and collection tracking","—","keep"],
 ["SKU → Profitability","break","No contribution model","Value-destroying SKUs invisible","Contribution model"],
 ["Inventory → Working Capital","break","Inventory off balance sheet","33.2 M stock unbooked (WH 10738)","Inventory valuation & reconciliation"],
 ["Quality → Supplier Performance","break","No quality data","Supplier quality unmeasured","Quality + supplier scorecard"],
@@ -983,4 +983,7 @@ show("overview");
 </script>
 </body>
 </html>
+
+
+
 
