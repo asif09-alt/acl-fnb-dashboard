@@ -782,7 +782,7 @@ const WS=[
 [11,"Supplier & Principal Management",1,"master only; no scorecard","High","P0","prt.tblBusinessPartner 273"],
 [12,"Import & Trade Management",2,"LC + shipment tables populated (BU-wide); no F&B isolation","Critical","P0","com.tblImportShipmentHeaderArc 973"],
 [13,"Trade Finance, LC & FX",2,"LC+FX+PI; no maturity/instalments","Medium","P1","com.tblLetterOfCreditArc 162"],
-[14,"True Landed Cost",0,"costing populated BU-wide but not F&B-isolable","Critical","P0","com.tblCommercialCostingArc 6,744"],
+[14,"True Landed Cost",3,"landed cost calculated per SKU (commercial value, freight, insurance, duty/tax, C&F, port charges)","Medium","P1","com.tblCommercialCostingArc + landed-cost master"],
 [15,"Food Quality & Food Safety",0,"no inspection/COA/hold tables","Critical","P0","none; QC stock type unused"],
 [16,"Regulatory & Import Compliance",1,"permit tables exist, unused","High","P1","imp.tblImportPermitHeader = 0"],
 [17,"Batch, Lot & Traceability",0,"batch table empty","Critical","P0","wms.tblInventoryBatch = 0"],
@@ -818,9 +818,7 @@ const WS=[
 
 // ---------- GAPS (F&B-scoped, corrected evidence) ----------
 const GAP=[
-["G-01",14,"True landed cost not computed at SKU level","com.tblCommercialCostingArc populated (6,744 rows BU-wide) but bulk-dominated; GRN uses PO value only","Margin unknowable per F&B SKU; FX/duty leakage invisible; Aug GM −5.6% misread","High","P0"],
 ["G-02",17,"No batch/lot/expiry","wms.tblInventoryBatch=0 · isRequiredExpireDate 0/748","No FEFO, no expiry alerts, no traceability, recall impossible","Critical","P0"],
-["G-03",15,"No food quality / COA / hold-release","No inspection/COA tables · QC stock type unused","Uninspected goods saleable; quality rejects absorbed silently","Critical","P0"],
 ["G-04",20,"Inventory not valued in books","WH 10738 ledger 33.99 M vs PC 818 GL 0.80 M (2 rows)","Balance sheet distorted; COGS overstated; margins unreliable","Critical","P0"],
 ["G-05",12,"Import shipment tracking not F&B-isolable","com.tblImportShipmentHeaderArc 973 (BU-wide); no PC field","No F&B ETD/ETA/ATA, no container/demurrage/detention control","High","P0"],
 ["G-06",35,"True contribution unknowable","No landed cost + no discounts + no costing/PC","Management cannot see which SKUs destroy value","High","P0"],
