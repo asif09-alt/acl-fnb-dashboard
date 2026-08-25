@@ -478,10 +478,18 @@ td b{color:var(--text)}
     </div>
   </div>
 
-  <div class="card">
-    <h3>Import origins — 162 LCs · BDT 5,356 M (BU 221, At Sight, USD @ ~123)</h3>
-    <div class="radar-list" id="origin-list"></div>
-    <div class="note">Russia &amp; South Africa dominate — but these are bulk commodities (wheat/peas/fruits) OUT of F&amp;B scope. F&amp;B-specific LCs (Ready Food / Canned Tuna / Chicken Powder) = 9 LCs / BDT 51.7 M.</div>
+<div class="card">
+    <h3>Import pipeline — active shipments (Aug 2026)</h3>
+    <table>
+      <thead><tr><th>Shipment</th><th>Origin</th><th>SKUs</th><th>LC Value (FOB, BDT)</th><th>Landed Cost (BDT)</th><th>Budgeted GP%</th><th>Actual NP%</th></tr></thead>
+      <tbody>
+        <tr><td><b>Thailand — Assorted</b> (SEEZA: sauces, rice stick, dairy &amp; coconut milk, seasoning, tempura, canned tuna, coffee &amp; malt)</td><td>Thailand</td><td>33</td><td>18,861,110</td><td>18,703,452</td><td>21.95%</td><td>9.21%</td></tr>
+        <tr><td><b>Malaysia — Assorted</b> (CSD, isotonic, RTD coffee, mixers, oats &amp; cereal, noodles, biscuits, juice conc., nata de coco, infant formula, baby cereal, chips, seasoning)</td><td>Malaysia</td><td>81</td><td>19,787,425</td><td>15,076,240</td><td>21.05%</td><td>9.37%</td></tr>
+        <tr><td><b>China — Mushroom</b> (canned mushroom &amp; preserved vegetables — Amoy Top Food)</td><td>China</td><td>4</td><td>10,251,066</td><td>13,778,530</td><td>17.89%</td><td>6.38%</td></tr>
+        <tr style="background:rgba(63,127,224,.08)"><td><b>TOTAL</b></td><td></td><td><b>118</b></td><td><b>48,899,601</b></td><td><b>47,558,222</b></td><td><b>21.21%</b></td><td><b>8.44%</b></td></tr>
+      </tbody>
+    </table>
+    <div class="note">Source: ACL August LC Summary (Malaysia / Thailand / China shipments). China mushroom = 93.6% of its LC — the in-flight replenishment for the Oasis Mushroom stock-out.</div>
   </div>
 
   <div class="grid2">
@@ -868,9 +876,8 @@ const CHAINS=[
 ["Action → Outcome → Learning","break","No closed loop","No learning","Outcome tracking"]
 ];
 
-// ---------- CAT COST / ORIGIN / EVIDENCE ----------
+// ---------- CAT COST / EVIDENCE ----------
 const CATCOST=[["MILK",8.49,"#dc5c53"],["Canned Food",6.39,"#e6b06a"],["Beverage & Drinking",6.24,"#8db6dd"],["Snacks",2.51,"#8db6dd"],["Sauce & Spread",2.43,"#8db6dd"],["Baking",2.34,"#74cfa8"],["Cereal",1.52,"#74cfa8"],["Honey (Trading Goods)",0.74,"#74cfa8"],["Oil",0.34,"#74cfa8"]];
-const ORIGIN=[["Russia",2183],["South Africa",1477],["China",451],["Egypt",308],["Brazil",273],["United Arab Emirates",263],["Burkina Faso",154],["Saudi Arabia",91],["Mali",62],["Cameroon",53]];
 const EV=[
 ["Items / SKUs (BU 221)","748 live · barcodes 0/748","itm.tblItemArc","Verified"],
 ["F&B SKUs on hand (WH 10738)","253 · 119,299 units · BDT 33.99 M","wms.tblInventoryTransactionRowArc net","Verified"],
@@ -972,10 +979,6 @@ CHAINS.forEach(([name,st,cause,cons,fix])=>{
 // cat cost list (max 8.49)
 const ccl=document.getElementById("cat-cost-list");
 CATCOST.forEach(([n,v,col])=>{const li=document.createElement("li");li.innerHTML=`<span class="rl-name"><b>${n}</b> · ${v.toFixed(2)} M BDT</span><div class="radar-track"><div class="radar-fill" style="width:${(v/8.49)*100}%;background:${col}"></div></div>`;ccl.appendChild(li);});
-
-// origin list (max 2183)
-const ol=document.getElementById("origin-list");
-ORIGIN.forEach(([n,v])=>{const li=document.createElement("li");li.innerHTML=`<span class="rl-name"><b>${n}</b> · ${v.toLocaleString()} M</span><div class="radar-track"><div class="radar-fill" style="width:${(v/2183)*100}%"></div></div>`;ol.appendChild(li);});
 
 // evidence
 const et=document.getElementById("ev-tbody");
