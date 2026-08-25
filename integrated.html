@@ -526,8 +526,8 @@ td b{color:var(--text)}
     <table>
       <thead><tr><th>Role</th><th>Named Owner</th></tr></thead>
       <tbody>
-        <tr><td>Business Head / Head of Sales (pricing, profitability, demand planning)</td><td><b>Imran Hossen</b></td></tr>
-        <tr><td>Finance Controller (inventory valuation, landed cost, credit/collection)</td><td><b>Sajjad Hossain</b></td></tr>
+        <tr><td>Business Head / Head of Sales (pricing, profitability, demand planning)</td><td><b>Md. Imran Hossen</b></td></tr>
+        <tr><td>Finance Controller (inventory valuation, landed cost, credit/collection)</td><td><b>Md. Sajjad Hossain</b></td></tr>
         <tr><td>Warehouse Head (FEFO/expiry execution)</td><td><b>Bashir Alam</b></td></tr>
         <tr><td>IT / ERP owner (system builds: batch module, AR subledger, pricing rules)</td><td><b>H M Omar Hasnain Real</b></td></tr>
         <tr><td>Supply Chain / Procurement / Import lead (batch/expiry, import tracking, LC)</td><td class="s-red"><b>NO DEDICATED PERSON — dependency</b> (Recovery Plan: assign within 11 days)</td></tr>
@@ -939,7 +939,7 @@ const et=document.getElementById("ev-tbody");
 EV.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td><b>${r[0]}</b></td><td>${r[1]}</td><td class="ev">${r[2]}</td><td><span class="tag ${sevT["Medium"]}">${r[3]}</span></td>`;et.appendChild(tr);});
 
 // ---------- CLOSURE SCHEDULE ----------
-const OWNERS={IH:"Imran Hossen",SH:"Sajjad Hossain",BA:"Bashir Alam",HR:"H M Omar Hasnain Real",TBA:"TBA (no dedicated procurement/import person)"};
+const OWNERS={IH:"Md. Imran Hossen",SH:"Md. Sajjad Hossain",BA:"Bashir Alam",HR:"H M Omar Hasnain Real",TBA:"TBA (no dedicated procurement/import person)"};
 const SCHED_GAP=[
 ["G-02","No batch/lot/expiry (manual today)","BA","30 Sep 2026","Batch/expiry register + FEFO release list signed by Warehouse Head","P0"],
 ["G-04","Inventory not valued in books","SH","30 Sep 2026","Finance-signed GL reconciliation (ERP stock vs GL)","P0"],
@@ -994,6 +994,7 @@ show("overview");
 </script>
 </body>
 </html>
+
 
 
 
