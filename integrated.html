@@ -364,7 +364,7 @@ td b{color:var(--text)}
     <p>Every workspace of the Food &amp; Beverage management loop scored for today's capability vs the 5.0 target. Ranked weakest → strongest.</p></div>
   <div class="table-scroll">
     <table>
-      <thead><tr><th>#</th><th>Workspace</th><th>Current</th><th>Capability bar</th><th>Gap</th><th>Severity</th><th>Priority</th><th>Evidence</th></tr></thead>
+      <thead><tr><th>#</th><th>Workspace</th><th>Current</th><th>Capability bar</th><th>Gap</th><th>Severity</th><th>Priority</th><th>Target Date</th><th>Evidence</th></tr></thead>
       <tbody id="score-tbody"></tbody>
     </table>
   </div>
@@ -382,7 +382,7 @@ td b{color:var(--text)}
   </div>
   <div class="table-scroll">
     <table>
-      <thead><tr><th>ID</th><th>Workspace</th><th>Gap</th><th>Evidence</th><th>Business / Financial impact</th><th>Risk</th><th>Pri</th></tr></thead>
+      <thead><tr><th>ID</th><th>Workspace</th><th>Gap</th><th>Evidence</th><th>Business / Financial impact</th><th>Risk</th><th>Pri</th><th>Owner</th><th>Target Date</th></tr></thead>
       <tbody id="gap-tbody"></tbody>
     </table>
   </div>
@@ -888,6 +888,8 @@ COMM.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td><b>${r[
 const sevT={"Critical":"t-crit","High":"t-high","Medium":"t-med","Low":"t-low"};
 const priColor={"P0":"s-red","P1":"s-yellow","P2":"s-green","P3":"s-grey"};
 const stb=document.getElementById("score-tbody");
+const WS_DATE={1:"30-Sep-26",2:"30-Sep-26",3:"15-Sep-26",4:"15-Sep-26",5:"15-Sep-26",6:"15-Sep-26",7:"30-Sep-26",8:"15-Sep-26",9:"15-Sep-26",10:"30-Sep-26",11:"30-Sep-26",12:"30-Sep-26",13:"31-Aug-26",14:"31-Aug-26",15:"30-Sep-26",16:"30-Sep-26",17:"30-Sep-26",18:"30-Sep-26",20:"30-Sep-26",21:"30-Sep-26",22:"30-Sep-26",23:"30-Sep-26",24:"30-Sep-26",25:"30-Sep-26",26:"30-Sep-26",27:"30-Sep-26",28:"30-Sep-26",29:"30-Sep-26",30:"30-Sep-26",31:"30-Sep-26",32:"15-Sep-26",33:"30-Sep-26",34:"30-Sep-26",35:"30-Sep-26",36:"15-Sep-26",37:"15-Sep-26",38:"15-Sep-26",39:"30-Sep-26",40:"30-Sep-26",41:"30-Sep-26",42:"30-Sep-26",43:"30-Sep-26",44:"30-Sep-26",45:"30-Sep-26"};
+const WS_OWNER={1:"Md. Imran Hossen",2:"Md. Imran Hossen",3:"Md. Imran Hossen",4:"Md. Imran Hossen",5:"Md. Imran Hossen",6:"Md. Imran Hossen",7:"CSCO",8:"Md. Imran Hossen",9:"Md. Imran Hossen",10:"CSCO",11:"CSCO",12:"CSCO",13:"Md. Sajjad Hossain",14:"Md. Sajjad Hossain",15:"CSCO",16:"CSCO",17:"Bashir Alam",18:"Bashir Alam",20:"Bashir Alam",21:"Bashir Alam",22:"Md. Imran Hossen",23:"Md. Imran Hossen",24:"Md. Imran Hossen",25:"Md. Imran Hossen",26:"Md. Imran Hossen",27:"Md. Imran Hossen",28:"Md. Imran Hossen + Md. Sajjad Hossain",29:"Md. Imran Hossen",30:"Md. Imran Hossen",31:"Bashir Alam",32:"Md. Imran Hossen",33:"Bashir Alam",34:"Bashir Alam",35:"Md. Imran Hossen",36:"Md. Sajjad Hossain",37:"Md. Imran Hossen",38:"Md. Imran Hossen",39:"Md. Sajjad Hossain",40:"H M Omar Hasnain Real",41:"Md. Imran Hossen",42:"Md. Imran Hossen",43:"H M Omar Hasnain Real",44:"Md. Imran Hossen",45:"H M Omar Hasnain Real"};
 WS.slice().sort((a,b)=>a[2]-b[2]).forEach(w=>{
   const tr=document.createElement("tr");
   const gap=5-w[2];
@@ -897,6 +899,7 @@ WS.slice().sort((a,b)=>a[2]-b[2]).forEach(w=>{
   <td><span class="mono">${gap.toFixed(0)}</span></td>
   <td><span class="tag ${sevT[w[5]]}">${w[5]}</span></td>
   <td><span class="tag ${priColor[w[6]]}">${w[6]}</span></td>
+  <td class="mono">${WS_DATE[w[0]]||''}</td>
   <td class="ev">${w[7]}</td>`;
   stb.appendChild(tr);
 });
@@ -909,7 +912,9 @@ function renderGaps(){const tb=document.getElementById("gap-tbody");tb.innerHTML
     tr.innerHTML=`<td class="mono">${g[0]}</td><td class="mono">WS ${g[1]}</td><td><b>${g[2]}</b></td>
     <td class="ev">${g[3]}</td><td>${g[4]}</td>
     <td><span class="tag ${sevT[g[5]]}">${g[5]}</span></td>
-    <td><span class="tag ${priColor[g[6]]}">${g[6]}</span></td>`;
+    <td><span class="tag ${priColor[g[6]]}">${g[6]}</span></td>
+    <td>${WS_OWNER[g[1]]||''}</td>
+    <td class="mono">${WS_DATE[g[1]]||''}</td>`;
     tb.appendChild(tr);
   });
 }
@@ -921,10 +926,36 @@ renderGaps();
 
 // chains
 const cl=document.getElementById("chain-list");
+const CHAIN_SCHED={
+"Market → Category":["Md. Imran Hossen","30-Sep-26"],
+"Category → Brand":["Md. Imran Hossen","15-Sep-26"],
+"Brand → SKU":["Md. Imran Hossen","15-Sep-26"],
+"SKU → Demand Forecast":["Md. Imran Hossen","15-Sep-26"],
+"Demand → Procurement":["CSCO","30-Sep-26"],
+"Procurement → Import":["CSCO",""],
+"Import → Landed Cost":["Md. Sajjad Hossain","31-Aug-26"],
+"Landed Cost → Inventory":["Md. Sajjad Hossain","30-Sep-26"],
+"Inventory → Batch":["Bashir Alam","30-Sep-26"],
+"Batch → Expiry":["Bashir Alam","30-Sep-26"],
+"Batch → Customer":["Bashir Alam","30-Sep-26"],
+"Customer → Sales":["Md. Imran Hossen","30-Sep-26"],
+"Sales → Collection":["Md. Imran Hossen + Md. Sajjad Hossain",""],
+"SKU → Profitability":["Md. Imran Hossen","30-Sep-26"],
+"Inventory → Working Capital":["Md. Sajjad Hossain","15-Sep-26"],
+"Quality → Supplier Performance":["CSCO","30-Sep-26"],
+"Complaint → Batch Traceability":["Bashir Alam","30-Sep-26"],
+"Strategy → KPI":["Md. Imran Hossen","15-Sep-26"],
+"KPI → Initiative":["Md. Imran Hossen","30-Sep-26"],
+"Exception → Decision":["Md. Imran Hossen","30-Sep-26"],
+"Decision → Action":["Md. Imran Hossen","30-Sep-26"],
+"Action → Outcome → Learning":["Md. Imran Hossen","30-Sep-26"]
+};
 CHAINS.forEach(([name,st,cause,cons,fix])=>{
   const d=document.createElement("div");d.className="chain";
   const stTxt=st==="ok"?"<span class='s-green'>INTACT</span>":st==="partial"?"<span class='s-yellow'>PARTIAL</span>":"<span class='s-red'>BROKEN</span>";
-  d.innerHTML=`<div class="chain-head"><span class="chain-name">${name}</span><span class="chain-status">${stTxt}</span></div>
+  const sched=CHAIN_SCHED[name]||["",""];
+  const schedTxt=sched[1]?`<span class="mono" style="color:var(--gold-lt)"> · ${sched[0]} · ${sched[1]}</span>`:(st==="ok"?"":`<span class="mono" style="color:var(--faint)"> · ${sched[0]}</span>`);
+  d.innerHTML=`<div class="chain-head"><span class="chain-name">${name}${schedTxt}</span><span class="chain-status">${stTxt}</span></div>
   <div class="chain-body"><p><b style="color:var(--text)">Cause</b> · ${cause}</p><p><b style="color:var(--text)">Consequence</b> · ${cons}</p><p class="fix">▲ Fix · ${fix}</p></div>`;
   d.querySelector(".chain-head").addEventListener("click",()=>d.classList.toggle("open"));
   cl.appendChild(d);
