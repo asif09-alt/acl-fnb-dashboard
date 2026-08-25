@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACL F&B — Quantified Recovery Dashboard (SBU 221 / PC 818 / WH 10738)</title>
+<style>
+:root{
+  --ink:#090c11; --panel:#12161e; --panel2:#181e29; --rule:#262e3b; --rule-soft:#1c2330;
+  --gold:#3f7fe0; --gold-lt:#7aabf2; --text:#eef1f6; --muted:#8d99ab; --faint:#5f6b7d;
+  --pos:#3fb37f; --neg:#dc5c53; --warn:#d99a3d; --cool:#5b8bb5;
+  --display:"Fraunces",Georgia,"Times New Roman",serif;
+  --body:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1100px 620px at 78% -12%, #16202e 0%, transparent 62%),
+    radial-gradient(900px 500px at 4% 108%, #11161f 0%, transparent 58%),
+    var(--ink);
+  color:var(--text); font-family:var(--body); font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1380px;margin:0 auto;padding:40px 26px 90px}
+.mast{border-bottom:1px solid var(--rule);padding-bottom:26px;margin-bottom:34px}
+.brandmark{display:flex;align-items:center;gap:8px;margin:0 0 18px}
+.brandmark span{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.04em;color:var(--text)}
+.brandmark .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin:0 0 14px}
+.mast h1{font-family:var(--display);font-weight:300;font-size:clamp(28px,4.4vw,48px);line-height:1.04;margin:0 0 12px;letter-spacing:-.015em}
+.mast h1 em{font-style:normal;font-weight:700;color:var(--gold-lt)}
+.standfirst{max-width:80ch;color:var(--muted);margin:0;font-size:15.5px}
+.srcline{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-top:14px}
+.chiprow{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--muted);border:1px solid var(--rule);padding:5px 11px;border-radius:20px;background:var(--panel)}
+.chip b{color:var(--text)}
+
+nav{position:sticky;top:0;z-index:40;background:rgba(9,12,17,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);margin-bottom:34px}
+nav .inner{max-width:1380px;margin:0 auto;padding:12px 26px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+nav button{background:none;border:1px solid transparent;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:7px 12px;border-radius:3px;cursor:pointer;transition:.15s}
+nav button:hover{color:var(--text);border-color:var(--rule)}
+nav button.active{color:var(--gold);border-color:var(--gold);background:rgba(63,127,224,.08)}
+
+section{display:none;animation:fade .3s ease}
+section.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.sec-head{margin:0 0 22px}
+.sec-head h2{font-family:var(--display);font-weight:600;font-size:26px;margin:0 0 6px}
+.sec-head p{color:var(--muted);margin:0;max-width:85ch}
+
+.gauges{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:24px 0}
+.gauge{background:linear-gradient(160deg,var(--panel2) 0%,var(--panel) 70%);border:1px solid var(--rule);border-radius:3px;padding:18px;position:relative;overflow:hidden}
+.gauge::after{content:"";position:absolute;inset:0 auto 0 0;width:2px;background:var(--gold);opacity:.7}
+.gname{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 0 7px}
+.gvalue{font-family:var(--display);font-weight:700;font-size:25px;color:var(--text);margin:0}
+.gsub{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:5px}
+.gv.pos{color:var(--pos)} .gv.neg{color:var(--neg)} .gv.warn{color:var(--warn)}
+
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:16px}
+.card{background:linear-gradient(160deg,var(--panel2) 0%,var(--panel) 70%);border:1px solid var(--rule);border-radius:3px;padding:20px;margin-bottom:16px}
+.card h3{margin:0 0 12px;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-lt)}
+.card p{margin:0 0 10px;color:var(--muted);font-size:14px}
+.card ul{margin:0 0 10px;padding-left:18px;color:var(--muted);font-size:14px}
+.card li{margin-bottom:6px}
+.card .note{font-family:var(--mono);font-size:11.5px;color:var(--faint);border-top:1px solid var(--rule-soft);padding-top:10px;margin-top:10px}
+.tag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.08em;padding:3px 8px;border-radius:3px;margin:2px 4px 2px 0;text-transform:uppercase}
+.t-crit{background:rgba(220,92,83,.14);color:#e98a83;border:1px solid rgba(220,92,83,.35)}
+.t-high{background:rgba(217,154,61,.12);color:#e6b06a;border:1px solid rgba(217,154,61,.35)}
+.t-med{background:rgba(91,139,181,.12);color:#8db6dd;border:1px solid rgba(91,139,181,.35)}
+.t-low{background:rgba(63,179,127,.12);color:#74cfa8;border:1px solid rgba(63,179,127,.35)}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+thead th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule);position:sticky;top:0;background:var(--panel)}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--rule-soft);vertical-align:top;color:var(--muted)}
+tbody tr:hover td{background:rgba(63,127,224,.05)}
+td b{color:var(--text)}
+.table-scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--panel);max-height:640px;overflow-y:auto}
+.mono{font-family:var(--mono);font-size:12px}
+.scorebar{display:flex;align-items:center;gap:8px}
+.sb-track{flex:1;height:8px;background:#0d1219;border:1px solid var(--rule);border-radius:4px;overflow:hidden;display:flex}
+.sb-fill{height:100%}
+.sb-cur{background:linear-gradient(90deg,#3f7fe0,#7aabf2)}
+.sb-target{background:rgba(63,179,127,.5)}
+.sb-label{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap}
+
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.flow-step{background:var(--panel2);border:1px solid var(--rule);border-radius:3px;padding:7px 11px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.flow-step.on{color:var(--pos);border-color:rgba(63,179,127,.4)}
+.flow-step.off{color:var(--faint);border-color:var(--rule);opacity:.75}
+.flow-step.miss{border-color:rgba(220,92,83,.4);color:#e98a83}
+.flow-arrow{color:var(--faint);font-size:11px}
+
+.chain{border:1px solid var(--rule);border-radius:3px;margin-bottom:10px;background:var(--panel)}
+.chain-head{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;cursor:pointer}
+.chain-head .chain-name{font-family:var(--mono);font-size:12px;letter-spacing:.05em;color:var(--text)}
+.chain-head .chain-status{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em}
+.chain-body{padding:0 14px 14px;display:none}
+.chain.open .chain-body{display:block}
+.chain-body p{margin:4px 0;font-size:13.5px;color:var(--muted)}
+.chain-body .fix{color:var(--pos);font-size:13px;margin-top:8px}
+.s-green{color:var(--pos)} .s-red{color:var(--neg)} .s-yellow{color:var(--warn)} .s-grey{color:var(--faint)}
+
+.radar-list{list-style:none;margin:0;padding:0}
+.radar-list li{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.radar-list .rl-name{flex:1;font-size:13.5px;color:var(--muted)}
+.radar-list .rl-name b{color:var(--text)}
+.radar-track{width:110px;height:7px;background:#0d1219;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.radar-fill{height:100%}
+
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:4px 10px;border-radius:20px;border:1px solid var(--rule);color:var(--muted);margin:3px 5px 3px 0}
+.pill.on{color:var(--pos);border-color:rgba(63,179,127,.45);background:rgba(63,179,127,.08)}
+.pill.wait{color:var(--warn);border-color:rgba(217,154,61,.45);background:rgba(217,154,61,.08)}
+.pill.no{color:var(--neg);border-color:rgba(220,92,83,.45);background:rgba(220,92,83,.08)}
+
+.filterbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.filterbar button{background:var(--panel2);border:1px solid var(--rule);color:var(--muted);font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:6px 11px;border-radius:3px;cursor:pointer}
+.filterbar button.active{color:var(--gold);border-color:var(--gold)}
+
+.road{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:20px 0}
+.road .phase{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--rule);border-top:2px solid var(--gold);border-radius:3px;padding:18px}
+.road .phase h3{margin:0 0 4px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--gold)}
+.road .phase .time{font-family:var(--display);font-size:20px;font-weight:700;margin:0 0 10px}
+.road .phase ul{margin:0;padding-left:16px;color:var(--muted);font-size:13px}
+.road .phase li{margin-bottom:5px}
+.verdict{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--rule);border-left:3px solid var(--gold);border-radius:3px;padding:20px;margin-bottom:16px}
+.verdict h3{margin:0 0 8px;font-family:var(--display);font-weight:700;font-size:18px}
+.verdict p{margin:0;color:var(--muted);font-size:14.5px}
+.ev{font-family:var(--mono);font-size:11.5px;color:var(--faint);word-break:break-word}
+</style>
+</head>
+<body>
+
+<nav><div class="inner" id="nav"></div></nav>
+
+<div class="wrap">
+
+<!-- MASTHEAD -->
+<div class="mast">
+  <div class="brandmark"><span class="dot"></span><span>AKIJ RESOURCE · BUSINESS SECRETARY</span></div>
+  <p class="eyebrow">Quantified Recovery Plan · Integrated Execution Dashboard · Live DWH Data</p>
+  <h1>AKIJ COMMODITIES LTD.<br><em>Food &amp; Beverage — Recovery Dashboard</em></h1>
+  <p class="standfirst">Integrated execution view of the <b style="color:var(--text)">Quantified Recovery Plan (25 Aug 2026)</b>: August target recovery, landed-cost &amp; price-floor controls, import/LC governance, exceptional-cost bridge, 10-month recovery case, and the Strategic Management System gap-closure register — all grounded in live DWH data for SBU 221 / PC 818 / WH 10738.</p>
+  <p class="srcline">BASED ON · Recovery Plan 25-Aug-2026 · DWH MSSQL (fin.tblAccountingJournalArc PC 818 · wms ledger · sms deliveries · fin bank journal) · ABP FY26-27 · 2026-08-25 · SCOPE: PC 818 / WH 10738 · Fruits &amp; Dates EXCLUDED</p>
+  <div class="chiprow">
+    <span class="chip">PROFIT CENTER <b>818 · F&amp;B</b></span>
+    <span class="chip">WAREHOUSE <b>10738 · DRY FOOD</b></span>
+    <span class="chip">AUG TARGET <b>BDT 1.91 Cr</b></span>
+    <span class="chip">ACHIEVED <b>26.8% (21 Aug)</b></span>
+    <span class="chip">EXCEPTIONAL COST <b>&gt;87 L</b></span>
+    <span class="chip">RECOVERY CASE <b>33.33 Cr · 3.8% NP</b></span>
+  </div>
+</div>
+
+<!-- ===================== SECTION: OVERVIEW ===================== -->
+<section id="sec-overview">
+  <div class="sec-head"><h2>Executive Overview — Where F&amp;B Stands</h2>
+    <p>Recovery-plan position reconciled to live DWH data (PC 818 / WH 10738).</p></div>
+
+  <div class="gauges">
+    <div class="gauge"><p class="gname">Aug Sales Plan</p><p class="gvalue">BDT 1.91 Cr</p><p class="gsub">Approved monthly target</p></div>
+    <div class="gauge"><p class="gname">Sales through 21 Aug</p><p class="gvalue gv warn">BDT 51.2 L</p><p class="gsub">26.8% · BDT 139.8 L remains</p></div>
+    <div class="gauge"><p class="gname">Required Daily (22–31 Aug)</p><p class="gvalue gv neg">BDT 13.98 L</p><p class="gsub">5.7x the 1–21 Aug run-rate</p></div>
+    <div class="gauge"><p class="gname">Reported Net Loss</p><p class="gvalue gv neg">BDT 23.5 L</p><p class="gsub">Must be bridged to exceptional costs</p></div>
+    <div class="gauge"><p class="gname">Exceptional Import Impact</p><p class="gvalue gv neg">&gt; BDT 87 L</p><p class="gsub">37 L July Thailand + ~50 L Aug Gatorade</p></div>
+    <div class="gauge"><p class="gname">F&amp;B Payable</p><p class="gvalue gv pos">Nil*</p><p class="gsub">*87.85 Cr is Fruits — Finance to confirm</p></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>August recovery math (from Recovery Plan)</h3>
+      <table>
+        <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Monthly target</td><td>BDT 191.0 L</td></tr>
+          <tr><td>Achieved through 21 Aug</td><td>BDT 51.2 L (26.8%)</td></tr>
+          <tr><td>Remaining target</td><td>BDT 139.8 L</td></tr>
+          <tr><td>Required daily, 22–31 Aug (10 days)</td><td><b>BDT 13.98 L/day</b></td></tr>
+          <tr><td>Multiple of 1–21 Aug daily run-rate</td><td class="s-red">≈ 5.7x</td></tr>
+        </tbody>
+      </table>
+      <div class="note">Full recovery within the month requires a tightly controlled stretch-sales programme — not business-as-usual execution.</div>
+    </div>
+    <div class="card">
+      <h3>Live DWH position (PC 818, as of 25 Aug)</h3>
+      <table>
+        <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>F&amp;B revenue FY26 YTD (Jul–Aug)</td><td>BDT 22.64 M</td></tr>
+          <tr><td>Jul revenue / COGS</td><td>16.78 M / 15.95 M (GM +5.0%)</td></tr>
+          <tr><td>Aug MTD revenue / COGS</td><td>5.86 M / 6.19 M (GM <span class="s-red">−5.6%</span>)</td></tr>
+          <tr><td>WH 10738 stock</td><td>119,299 units · BDT 33.99 M · 253 SKUs</td></tr>
+          <tr><td>Aug collections (F&amp;B, name-based)</td><td>BDT 8.06 M · 21 customers</td></tr>
+          <tr><td>Deliveries (cumulative)</td><td>325 · BDT 128.07 M · 53 customers</td></tr>
+        </tbody>
+      </table>
+      <div class="note">Order-book sales (Aug MTD 5.99 M) vs journal revenue (5.86 M) — gap reflects open/unbilled orders.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Management position on the payable</h3>
+    <p>The reported <b style="color:var(--text)">BDT 87.85 crore payable (~378 days)</b> does not represent the standalone F&amp;B profit centre. Following the July separation from Fruits, F&amp;B presently has <b style="color:var(--text)">no supplier payable recorded</b>, subject to Finance confirmation through a profit-centre-wise ledger reconciliation. The 87.85 Cr figure appears to include Fruits and is not attributable to standalone F&amp;B.</p>
+    <div class="note">Action: Finance Controller to reconcile 100% of supplier payables, GRNs, LC liabilities and accrued import costs between Fruits and F&amp;B within 24 hours; obtain Finance sign-off on the nil F&amp;B payable assertion.</div>
+  </div>
+</section>
+
+<!-- ===================== SECTION: EXCEPTIONAL ===================== -->
+<section id="sec-exc">
+  <div class="sec-head"><h2>Exceptional Import Costs — Margin Bridge</h2>
+    <p>The negative reported gross margin is materially affected by two exceptional import incidents. These must be shown separately in the management margin bridge — not concealed within normal trading margin.</p></div>
+
+  <div class="gauges">
+    <div class="gauge"><p class="gname">July — Thailand Shipment</p><p class="gvalue gv neg">&gt; BDT 37 L</p><p class="gsub">Customs hold · demurrage · penalties</p></div>
+    <div class="gauge"><p class="gname">August — Gatorade</p><p class="gvalue gv neg">~ BDT 50 L</p><p class="gsub">Assessment USD 1.50 → 7.92 (+428%)</p></div>
+    <div class="gauge"><p class="gname">Total Exceptional</p><p class="gvalue gv neg">&gt; BDT 87 L</p><p class="gsub">Requires GL reconciliation by Finance</p></div>
+    <div class="gauge"><p class="gname">Last-month F&amp;B COGS</p><p class="gvalue">BDT 1.59 Cr</p><p class="gsub">Not BDT 4.9 Cr</p></div>
+  </div>
+
+  <div class="card">
+    <h3>Incident register</h3>
+    <table>
+      <thead><tr><th>Period / Shipment</th><th>Event</th><th>Estimated impact</th><th>Evidence required</th></tr></thead>
+      <tbody>
+        <tr><td><b>Jul 2026</b> · Thailand shipment (May LC)</td><td>Held by Customs; port demurrage, penalties and related charges accumulated</td><td class="s-red">&gt; BDT 37 L</td><td>LC, BL, bill of entry, detention/demurrage invoices, penalty orders, C&amp;F bills</td></tr>
+        <tr><td><b>Aug 2026</b> · First LC shipment</td><td>Cleared normally, no material exception</td><td>Normal</td><td>Bill of entry, landed-cost sheet, clearance timeline</td></tr>
+        <tr><td><b>Aug 2026</b> · Second LC — Gatorade</td><td>Customs assessment changed USD 1.50 → 7.92 (5.28x, +428%)</td><td class="s-red">~ BDT 50 L</td><td>Previous &amp; revised assessments, duty/fine calc, C&amp;F correspondence</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Root cause — import-risk ownership break</h3>
+    <ul>
+      <li>Previous C&amp;F provider <b style="color:var(--text)">SANUR AGENCY</b> (also handled Fruits) removed due to Fruits issues.</li>
+      <li><b style="color:var(--text)">Akij Logistics C&amp;F</b> appointed after F&amp;B/Fruits separation without a developed transition control for F&amp;B-specific assessment risks.</li>
+      <li>No dedicated procurement/import resource for pre-shipment document validation, HS-code/assessment checks, C&amp;F coordination, landed-cost forecasting, exception escalation.</li>
+      <li>Corporate Affairs liaison with Customs/BSTI not embedded as a formal pre-clearance control.</li>
+      <li>Pricing controls did not isolate recurring product economics from unplanned demurrage/penalties/reassessment → reported GM negative.</li>
+    </ul>
+    <div class="note">Fix: dedicated F&amp;B procurement/import specialist · F&amp;B-specialist C&amp;F provider · Corporate Affairs Customs/BSTI protocol · pre-shipment clearance-readiness meeting for every import.</div>
+  </div>
+</section>
+
+<!-- ===================== SECTION: CONTROLS ===================== -->
+<section id="sec-ctrl">
+  <div class="sec-head"><h2>Immediate Pricing &amp; Landed-Cost Controls</h2>
+    <p>CONTROL EFFECTIVE IMMEDIATELY — no new order may be released below the approved gross-margin floor based on the latest validated landed cost. Any exception requires written approval from Business Head + Finance.</p></div>
+
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Action</th><th>Quantified rule / output</th><th>Owner</th><th>Timing</th><th>Evidence</th></tr></thead>
+      <tbody id="ctrl-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>High-risk SKU hold</h3>
+    <p><b style="color:var(--text)">Gatorade</b> and all SKUs exposed to assessment changes are <b style="color:var(--neg)">ON HOLD</b> for fresh import until pre-assessment and profitability are approved. Stock liquidation guardrail: near-expiry/slow-stock discounts only against a documented net-recovery comparison; prohibit selling where avoidable incremental loss exceeds disposal/holding risk without approval.</p>
+    <div class="note">Gatorade on-hand (WH 10738): Lemon 1,800 · Grape 1,182 · Blue Bolt 840 units — all 0% movement (dead stock band).</div>
+  </div>
+</section>
+
+<!-- ===================== SECTION: LC ===================== -->
+<section id="sec-lc">
+  <div class="sec-head"><h2>Payable &amp; LC Overhang Correction</h2>
+    <p>Establish the correct payable position and prevent future LC overhang.</p></div>
+
+  <div class="gauges">
+    <div class="gauge"><p class="gname">LCs (BU 221)</p><p class="gvalue">162</p><p class="gsub">USD 45.84 M · BDT 5,356 M</p></div>
+    <div class="gauge"><p class="gname">Open / Incomplete LCs</p><p class="gvalue gv warn">40</p><p class="gsub">BDT 1,341 M exposure</p></div>
+    <div class="gauge"><p class="gname">F&amp;B-specific LCs</p><p class="gvalue">9</p><p class="gsub">BDT 51.7 M · 2 open = 15.5 M</p></div>
+    <div class="gauge"><p class="gname">Reported Payable</p><p class="gvalue gv neg">87.85 Cr</p><p class="gsub">Fruits-inclusive — not F&amp;B</p></div>
+  </div>
+
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Action</th><th>Quantified deliverable</th><th>Owner</th><th>Deadline</th></tr></thead>
+      <tbody id="lc-tbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== SECTION: RECOVERY ===================== -->
+<section id="sec-rec">
+  <div class="sec-head"><h2>Quantified Sales &amp; Profitability Recovery</h2>
+    <p>August target recovery + the 10-month recovery case (Sep 2026 – Jun 2027).</p></div>
+
+  <div class="gauges">
+    <div class="gauge"><p class="gname">Planned Sales Sep26–Jun27</p><p class="gvalue">BDT 33.33 Cr</p><p class="gsub">Approved planning case</p></div>
+    <div class="gauge"><p class="gname">Projected Net Profit</p><p class="gvalue gv pos">BDT 1.27 Cr</p><p class="gsub">3.8% margin · ~12.67 L/month</p></div>
+    <div class="gauge"><p class="gname">Recover 87 L exceptional</p><p class="gvalue">≈ 6.9 months</p><p class="gsub">Recover 1.00 Cr ≈ 7.9 months</p></div>
+    <div class="gauge"><p class="gname">Headroom after 1.00 Cr</p><p class="gvalue gv pos">BDT 26.65 L</p><p class="gsub">Planning case, not guaranteed</p></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>August recovery execution</h3>
+      <ul>
+        <li>Focus on <b style="color:var(--text)">available, positive-contribution inventory</b>; confirmed customer orders</li>
+        <li>MT, HoReCa, corporate and wholesale conversions; overdue order follow-up</li>
+        <li>Daily sales/collection review</li>
+        <li><b style="color:var(--text)">Revenue will NOT be pursued through unapproved below-cost pricing</b></li>
+        <li>Month-end submission shows both target result and margin protected by the price floor</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Recovery conditions (must hold)</h3>
+      <ul>
+        <li>Timely LC approval</li>
+        <li>No repeat customs shock</li>
+        <li>Positive-margin pricing</li>
+        <li>Adequate working capital</li>
+        <li>Profitable product mix</li>
+        <li>Delivery of the BDT 33.33 Cr sales plan</li>
+      </ul>
+      <div class="note">The BDT 1.27 Cr projected profit is a planning case — refresh monthly against actual sales, mix, margin, LC availability and import costs.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SECTION: GAPS ===================== -->
+<section id="sec-gaps">
+  <div class="sec-head"><h2>Strategic Management System — Gap Closure Register</h2>
+    <p>Each gap must be marked Closed with evidence or Blocked with a specific dependency, named owner and resolution time.</p></div>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Gap area</th><th>Immediate mitigation / control</th><th>Accountable owner</th><th>Closure evidence</th><th>Status</th></tr></thead>
+      <tbody id="gap-tbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== SECTION: COMMITMENTS ===================== -->
+<section id="sec-comm">
+  <div class="sec-head"><h2>Management Commitments &amp; Decisions Required</h2>
+    <p>Tracked to completion — weekly recovery dashboard through June 2027.</p></div>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Commitment / decision</th><th>Target date</th><th>Measure of completion</th><th>Status</th></tr></thead>
+      <tbody id="comm-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Decision requested from management</h3>
+    <ul>
+      <li>1 · Dedicated F&amp;B procurement/import capability</li>
+      <li>2 · Appointment of an F&amp;B-specialist C&amp;F provider</li>
+      <li>3 · Formal Corporate Affairs support for Customs and BSTI liaison</li>
+      <li>4 · Enforcement of the SKU-level landed-cost and price-floor gate</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===================== SECTION: FINANCE ===================== -->
+<section id="sec-fin">
+  <div class="sec-head"><h2>Financial Position — PC 818 (Live DWH)</h2>
+    <p>Verified from fin.tblAccountingJournalArc (intProfitCenterId=818). PC 818 data begins 2026-06-30; historical FY25-26 F&amp;B is NOT isolable from BU-wide figures.</p></div>
+
+  <div class="gauges">
+    <div class="gauge"><p class="gname">F&amp;B Revenue FY26 YTD</p><p class="gvalue">22.6 M</p><p class="gsub">Jul 16.78 M · Aug MTD 5.86 M</p></div>
+    <div class="gauge"><p class="gname">F&amp;B COGS FYTD</p><p class="gvalue gv neg">22.1 M</p><p class="gsub">Aug MTD COGS 6.19 M &gt; revenue</p></div>
+    <div class="gauge"><p class="gname">Gross Margin FYTD</p><p class="gvalue gv pos">+2.2%</p><p class="gsub">Jul +5.0% · Aug MTD −5.6%</p></div>
+    <div class="gauge"><p class="gname">WH 10738 Stock</p><p class="gvalue">33.99 M</p><p class="gsub">119,299 units · 253 SKUs · ledger net</p></div>
+    <div class="gauge"><p class="gname">GL Book Value (PC 818)</p><p class="gvalue gv neg">0.80 M</p><p class="gsub">2 rows only — posting incomplete</p></div>
+    <div class="gauge"><p class="gname">Aug Collections</p><p class="gvalue gv pos">8.06 M</p><p class="gsub">21 F&amp;B customers · name-based</p></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Profit &amp; Loss trend (PC 818, BDT M)</h3>
+      <table>
+        <thead><tr><th>Period</th><th>Revenue</th><th>COGS</th><th>GM %</th><th>Net Profit</th></tr></thead>
+        <tbody>
+          <tr><td>FY26 YTD (Jul–Aug)</td><td>22.6</td><td>22.1</td><td class="s-green">+2.2%</td><td class="s-red">−1.4</td></tr>
+          <tr><td>Jul 2026</td><td>16.8</td><td>15.9</td><td class="s-green">+5.0%</td><td class="s-red">−0.6</td></tr>
+          <tr><td>Aug 2026 (MTD 25)</td><td>5.9</td><td>6.2</td><td class="s-red">−5.6%</td><td class="s-red">−0.8</td></tr>
+        </tbody>
+      </table>
+      <div class="note">Reported net loss BDT 23.5 L must be reconciled to exceptional costs (87 L) and recurring margin. Cannot be decomposed — no landed cost, no category P&amp;L, no contribution.</div>
+    </div>
+    <div class="card">
+      <h3>Working capital &amp; receivables (F&amp;B)</h3>
+      <ul>
+        <li><b style="color:var(--text)">Unbooked inventory</b> ≈ 33.2 M (WH 10738 ledger vs GL 0.80 M)</li>
+        <li><b style="color:var(--text)">Perishable risk</b> — Milk 8.49 M + Canned 6.39 M + Beverage 6.24 M with no batch/expiry discipline</li>
+        <li><b style="color:var(--text)">Receivables</b> — 325 deliveries / 128.07 M cumulative; aging unreliable (0/325 marked paid)</li>
+        <li><b style="color:var(--text)">Collections Aug MTD</b> — 8.06 M (21 F&amp;B customers)</li>
+        <li><b style="color:var(--text)">Gatorade dead stock</b> — 3,822 units / 0% movement, on import hold</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+const NAV=[["overview","Overview"],["exc","Exceptional Costs"],["ctrl","Price Controls"],["lc","LC & Payable"],["rec","Recovery Case"],["gaps","Gap Closure"],["comm","Commitments"],["fin","Finance"]];
+
+// ---------- CONTROLS ----------
+const CTRL=[
+["SKU-level landed-cost reset","Recalculate every active SKU using commercial value, freight, insurance, duty/tax, C&F, port charges and attributable clearance costs. Maintain both normalised and actual landed cost.","Finance + Supply Chain","Within 24 hours","Approved landed-cost master"],
+["Below-cost sales block","Minimum invoice price = latest actual landed cost plus approved channel margin. System/manual price list to flag any price below landed cost.","Business Head + Finance","Immediate","Signed price list and blocked-order log"],
+["Exception-cost visibility","Show >BDT 87 L exceptional customs/demurrage impact separately in the management margin bridge; do not conceal within normal trading margin analysis.","Finance","Within 48 hours","GL reconciliation and margin bridge"],
+["High-risk SKU review","Gatorade and all SKUs exposed to assessment changes placed on hold for fresh import until pre-assessment and profitability are approved.","Procurement + Commercial","Immediate","Hold/release register"],
+["Stock liquidation guardrail","Near-expiry/slow-stock discounts only against a documented net-recovery comparison; prohibit selling where avoidable incremental loss exceeds disposal/holding risk without approval.","Sales + Finance","Daily","Discount approval and batch list"],
+["Daily margin monitoring","Report sales, gross profit, gross-margin %, below-floor exceptions and stock ageing by SKU/channel.","Business Planning","Daily through recovery","Daily dashboard"]
+];
+
+// ---------- LC / PAYABLE ----------
+const LC=[
+["Profit-centre reconciliation","Reconcile 100% of supplier payables, GRNs, LC liabilities and accrued import costs between Fruits and F&B; obtain Finance sign-off on the nil F&B payable assertion.","Finance Controller","Within 24 hours"],
+["LC exposure register","One live register covering LC value, margin, shipment ETA, assessment basis, duty forecast, document status, maturity and payment date for every open LC.","Procurement / Finance","Within 48 hours"],
+["Import commitment gate","No LC request without approved demand, target gross margin, cash-flow capacity, assessment validation and stock cover. Proven profitable products receive priority.","Business Head","Immediate"],
+["Supplier-term improvement","Seek 100% LC at sight/usance where feasible, longer usance, lower advance/local payment, document acceptance before shipment and price/freight adjustment through the next consignment.","Business Head + Procurement","Each negotiation"],
+["Exposure ceiling","Keep confirmed LC and supplier commitments within the approved rolling cash-flow and inventory plan; any excess requires MD/CFO approval.","Finance + Business Head","Weekly review"],
+["Weekly maturity review","Review 100% of LCs due within the next 90 days and document funding source, shipment status and expected stock conversion.","Finance","Every week"]
+];
+
+// ---------- GAP CLOSURE ----------
+const GAP=[
+["Landed cost","Approve normalised and actual landed cost by SKU; variance tolerance and escalation rule activated.","Finance Controller","Cost sheet + approval","P0"],
+["Inventory reconciliation","Reconcile ERP, warehouse and finance stock; isolate differences and assign correction.","Supply Chain Head","Signed reconciliation","P0"],
+["Batch / expiry","Batch-wise ageing, days-to-expiry and FEFO release list; quarantine exceptions.","Warehouse Head","Batch/expiry register","P0"],
+["Food quality","Map COA, health/radiation/other required certificates and test status against each shipment/SKU.","Quality / Regulatory","Certificate tracker","P0"],
+["Import tracking","Milestone tracker from PI/LC to vessel/air arrival, document readiness, assessment, clearance and GRN.","Procurement / Import","Live tracker","P0"],
+["Pricing","SKU-channel price floor and approval matrix; block below-cost order release.","Business Head + Finance","Approved price circular","P0"],
+["Credit & collection","Customer-wise ageing, limits, overdue hold and daily collection commitment.","Sales + Finance","Ageing and collection plan","P0"],
+["Profitability","SKU/customer/channel contribution report with exception-cost bridge.","Business Planning","Profitability dashboard","P0"],
+["Demand planning","Monthly consensus forecast linked to stock, open LC, sales plan and expiry risk.","Planning + Sales","Approved forecast","P1"],
+["Management controls","Daily exception dashboard and weekly cross-functional review with decisions and action closure.","Business Head","Minutes + action log","P1"]
+];
+
+// ---------- COMMITMENTS ----------
+const COMM=[
+["Validate F&B payable, COGS and exceptional-cost bridge","26 Aug 2026","Finance-signed reconciliation","OPEN"],
+["Issue corrected SKU/channel price list and stop-loss control","26 Aug 2026","100% active SKUs covered","OPEN"],
+["Complete LC/import exposure register","27 Aug 2026","100% open and planned LCs captured","OPEN"],
+["Conclude F&B C&F capability review and nominate provider","Within 7 days","Business Head approval","OPEN"],
+["Assign dedicated procurement/import resource","Within 7 days","Named resource and RACI issued","OPEN"],
+["Activate Customs/BSTI liaison protocol","Within 7 days","Named contacts, escalation path and checklist","OPEN"],
+["Submit weekly recovery dashboard","Weekly through Jun 2027","Sales, GM, NP, stock, LC, collections and gap status","OPEN"]
+];
+
+// ---------- RENDER ----------
+function show(sec){document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));document.getElementById("sec-"+sec).classList.add("active");document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.sec===sec));window.scrollTo({top:0,behavior:"smooth"})}
+const navEl=document.getElementById("nav");
+NAV.forEach(([id,label])=>{const b=document.createElement("button");b.textContent=label;b.dataset.sec=id;b.addEventListener("click",()=>show(id));navEl.appendChild(b);if(id==="overview")b.classList.add("active");});
+
+// controls table
+const ct=document.getElementById("ctrl-tbody");
+CTRL.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td class="ev">${r[4]}</td>`;ct.appendChild(tr);});
+
+// LC table
+const lt=document.getElementById("lc-tbody");
+LC.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td>`;lt.appendChild(tr);});
+
+// gap closure table
+const gt=document.getElementById("gap-tbody");
+const priColor={"P0":"s-red","P1":"s-yellow"};
+GAP.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td class="ev">${r[3]}</td><td><span class="tag ${r[4]==='P0'?'t-crit':'t-high'}">${r[4]}</span></td>`;gt.appendChild(tr);});
+
+// commitments table
+const cm=document.getElementById("comm-tbody");
+COMM.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td><span class="tag t-high">${r[3]}</span></td>`;cm.appendChild(tr);});
+
+show("overview");
+</script>
+</body>
+</html>
