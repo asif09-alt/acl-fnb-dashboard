@@ -256,9 +256,10 @@ td b{color:var(--text)}
     <p>Establish the correct payable position and prevent future LC overhang.</p></div>
 
 <div class="gauges">
-    <div class="gauge"><p class="gname">LCs (BU 221)</p><p class="gvalue">162</p><p class="gsub">USD 45.84 M · BDT 5,356 M</p></div>
+    <div class="gauge"><p class="gname">LCs (BU 221)</p><p class="gvalue">20</p><p class="gsub">F&amp;B-relevant LC count</p></div>
     <div class="gauge"><p class="gname">Genuinely Open F&amp;B LCs</p><p class="gvalue gv pos">0</p><p class="gsub">All F&amp;B LCs executed — verified 25 Aug</p></div>
     <div class="gauge"><p class="gname">F&amp;B-specific LCs</p><p class="gvalue">9</p><p class="gsub">BDT 51.7 M · all received into WH 10738</p></div>
+    <div class="gauge"><p class="gname">Reported Payable</p><p class="gvalue gv pos">0</p><p class="gsub">Standalone F&amp;B — no supplier payable</p></div>
   </div>
 
   <div class="table-scroll">
@@ -333,8 +334,7 @@ td b{color:var(--text)}
     <div class="gauge"><p class="gname">F&amp;B Revenue FY26 YTD</p><p class="gvalue">BDT 2.26 Cr</p><p class="gsub">PC 818 · Jul–Aug 2026 · journal-verified</p></div>
     <div class="gauge"><p class="gname">F&amp;B COGS FY26 YTD</p><p class="gvalue">BDT 2.21 Cr</p><p class="gsub">PC 818 · Jul–Aug 2026</p></div>
     <div class="gauge"><p class="gname">Gross Margin FYTD</p><p class="gvalue gv pos">+2.2%</p><p class="gsub">MTD Aug 2026 −5.6% (negative)</p></div>
-    <div class="gauge"><p class="gname">WH 10738 Stock</p><p class="gvalue">BDT 3.40 Cr</p><p class="gsub">119,299 units · 253 SKUs · ledger net</p></div>
-    <div class="gauge"><p class="gname">Import LCs (BU 221)</p><p class="gvalue gv warn">BDT 535.7 Cr</p><p class="gsub">162 LCs · 0 genuinely open F&amp;B</p></div>
+<div class="gauge"><p class="gname">WH 10738 Stock</p><p class="gvalue">BDT 3.40 Cr</p><p class="gsub">119,299 units · 253 SKUs · ledger net</p></div>
     <div class="gauge"><p class="gname">Batch / Expiry</p><p class="gvalue gv neg">0 / 748</p><p class="gsub">no batch table · no expiry flags</p></div>
   </div>
 
@@ -353,13 +353,8 @@ td b{color:var(--text)}
         <li>Purchases are expensed to COGS at GRN without inventory capitalization → COGS overstated, GM distorted.</li>
         <li>True landed cost (duty / FX / freight / C&amp;F / port) is <b>not captured at SKU level</b> — costing tables exist (6,744 rows BU-wide) but are bulk-commodity dominated and not F&amp;B-isolable.</li>
       </ul>
-      <div class="note">Fix order: inventory valuation &amp; reconciliation → landed cost → contribution → pricing.</div>
+<div class="note">Fix order: inventory valuation &amp; reconciliation → landed cost → contribution → pricing.</div>
     </div>
-  </div>
-
-  <div class="card">
-    <h3>Q5 — Ten biggest technical gaps (F&amp;B scope)</h3>
-    <div class="flow" id="techgap-flow"></div>
   </div>
 </section>
 
@@ -656,11 +651,10 @@ const CTRL=[
 
 // ---------- LC / PAYABLE ----------
 const LC=[
-["Profit-centre reconciliation","Reconcile 100% of supplier payables, GRNs, LC liabilities and accrued import costs between Fruits and F&B; obtain Finance sign-off on the nil F&B payable assertion.","Finance Controller","Within 24 hours"],
 ["LC exposure register","One live register covering LC value, margin, shipment ETA, assessment basis, duty forecast, document status, maturity and payment date for every open LC.","Procurement / Finance","Within 48 hours"],
 ["Import commitment gate","No LC request without approved demand, target gross margin, cash-flow capacity, assessment validation and stock cover. Proven profitable products receive priority.","Business Head","Immediate"],
 ["Supplier-term improvement","Seek 100% LC at sight/usance where feasible, longer usance, lower advance/local payment, document acceptance before shipment and price/freight adjustment through the next consignment.","Business Head + Procurement","Each negotiation"],
-["Exposure ceiling","Keep confirmed LC and supplier commitments within the approved rolling cash-flow and inventory plan; any excess requires MD/CFO approval.","Finance + Business Head","Weekly review"],
+["Exposure ceiling","Keep confirmed LC and supplier commitments within the approved rolling cash-flow and inventory plan; any excess requires MD/CEO approval.","Finance + Business Head","Weekly review"],
 ["Weekly maturity review","Review 100% of LCs due within the next 90 days and document funding source, shipment status and expected stock conversion.","Finance","Every week"]
 ];
 
@@ -796,7 +790,7 @@ const EV=[
 ["F&B SKUs on hand (WH 10738)","253 · 119,299 units · BDT 33.99 M","wms.tblInventoryTransactionRowArc net","Verified"],
 ["Business partners","540 · 273 sup / 239 cust","prt.tblBusinessPartnerArc","Verified"],
 ["Purchase orders","656 · 640 approved","pro.tblPurchaseOrderHeaderArc","Verified"],
-["LCs (BU 221)","162 At Sight · 5,356 M BDT · FX ~123 · 0 genuinely open F&amp;B","com.tblLetterOfCreditArc","Verified"],
+["LCs (BU 221)","20 F&amp;B-relevant LCs · 0 genuinely open F&amp;B","com.tblLetterOfCreditArc","Verified"],
 ["F&B-specific LCs","9 (Ready Food / Canned Tuna / Chicken Powder) · 51.7 M · 0 open (all executed)","com.tblLetterOfCreditArc (name-based)","Medium"],
 ["Import shipments (BU 221)","973 headers · 1,347 rows · USD 51.07 M","com.tblImportShipmentHeaderArc","Verified"],
 ["Import costing / landed cost","6,744 rows · BDT 12,903 M (BU-wide, bulk-dominated)","com.tblCommercialCostingArc","Verified"],
@@ -822,10 +816,6 @@ const EV=[
 function show(sec){document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));document.getElementById("sec-"+sec).classList.add("active");document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.sec===sec));window.scrollTo({top:0,behavior:"smooth"})}
 const navEl=document.getElementById("nav");
 NAV.forEach(([id,label])=>{const b=document.createElement("button");b.textContent=label;b.dataset.sec=id;b.addEventListener("click",()=>show(id));navEl.appendChild(b);if(id==="overview")b.classList.add("active");});
-
-// tech gaps flow
-const TECHTECH=["No F&B batch/expiry","No F&B landed cost","No quality module","No AR subledger","No pricing/offer modules","No profit-center config","No forecast / S&OP","RTM not used by ACL","Barcode infrastructure 0","Inventory↔GL data model broken"];
-document.getElementById("techgap-flow").innerHTML=TECHTECH.map((t,i)=>`<span class="flow-step miss">${i+1}. ${t}</span>`).join('<span class="flow-arrow">•</span>');
 
 // intact flow
 const INTACT=["PR","PO","LC","GRN","WMS","SO","DO","Invoice","Journal"];
@@ -909,3 +899,4 @@ show("overview");
 </script>
 </body>
 </html>
+
