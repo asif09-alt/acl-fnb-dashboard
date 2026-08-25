@@ -580,7 +580,6 @@ td b{color:var(--text)}
         <li>8/8 outlets visited (100%) · day sales <b style="color:var(--text)">BDT 1.2 Cr</b> · July MTD 1.56 Cr vs 1.62 Cr target (<b style="color:var(--text)">96%</b>)</li>
         <li>Key accounts: Divine Trade 0.59 Cr · Organic Trade 0.50 Cr · Afnan Trade 0.11 Cr</li>
         <li><b style="color:var(--text)">HIGH risk:</b> stock-out on Oasis Mushroom, Alfa Mayonnaise, Almarai — urgent replenishment within 7 working days</li>
-        <li><b style="color:var(--text)">MEDIUM risk:</b> no cold-chain capacity → frozen segment (cheese, whipped cream, chocolate, sausage) ceded to competitors</li>
         <li>Competitor launches: canned juice, mushroom, mayonnaise, snacks (Pringles), frozen items</li>
         <li><b style="color:var(--text)">Opportunity:</b> Vietnam canned juice requested by customers</li>
       </ul>
@@ -592,7 +591,6 @@ td b{color:var(--text)}
         <li><b style="color:var(--text)">Oasis Mushroom stock-out corroborated ×3</b> — market report (High) + DWH (2.15M 3-mo, stock 0) + survey (28.5K units/mo)</li>
         <li><b style="color:var(--text)">Tuna is the volume engine</b> (152.8K units/mo) yet Spring Water tuna at stock 0 — core-line stock-out risk</li>
         <li><b style="color:var(--text)">Mayonnaise (Alfa) gap</b> — Sauce &amp; Spread at only 1.03 months cover</li>
-        <li><b style="color:var(--text)">Cold-chain gap</b> — blocks frozen-category participation (competitors expanding)</li>
         <li><b style="color:var(--text)">Vietnam canned juice</b> — survey shows Vietnam brands (Senbita, JUSSVINA) already selling at 99–150 wholesale</li>
       </ul>
       <div class="note">These feed the Market Intelligence &amp; Demand Planning gaps in the Gap Register below.</div>
@@ -778,28 +776,27 @@ const COMM=[
 // ---------- WORKSPACES (F&B-scoped evidence) ----------
 const WS=[
 [1,"PC Executive Command Center",1,"finance reports only; no exception→decision cockpit","Critical","P0","fin.tblAccountingJournalArc PC 818 + DWH"],
-[2,"Market & Consumer Intelligence",0,"no market/trend/competitor objects","High","P0","oms.tblCompetitor* unused"],
+[2,"Market & Consumer Intelligence",3,"field survey (FieldScan, 403 outlets / 10 locations) + market visit reports","Medium","P1","FieldScan Survey Data + Market Intelligence Report 27-Jul"],
 [3,"Strategy Management",0,"no strategy/objective/initiative objects","High","P0","none in schema for ACL"],
 [4,"Category Management",1,"text categories; no hierarchy/analysis","High","P0","itm.tblItemArc.strItemCategoryName"],
 [5,"Brand Management",1,"brand only inside item names","High","P0","itm.tblItemArc (no brand col)"],
 [6,"SKU Portfolio Management",2,"253 F&B SKUs in WH 10738; no lifecycle","High","P0","itm.tblItemArc + wms ledger"],
 [7,"NPD / Import Introduction",1,"no structured NPD flow","Medium","P2","none"],
-[8,"Demand Forecasting",0,"no forecast for ACL","High","P0","rtm.tblImsForecast* no ACL rows"],
+[8,"Demand Forecasting",2,"demand informed by market intelligence (FieldScan survey + DWH sales)","Medium","P1","FieldScan Survey Data + DWH sales"],
 [9,"Sales & Operations Planning",0,"no integrated plan","High","P0","none"],
 [10,"International Sourcing & Procurement",2,"PR→PO→LC; no RFQ/scorecard for ACL","High","P0","pro.tblPurchaseOrderHeader 656"],
 [11,"Supplier & Principal Management",1,"master only; no scorecard","High","P0","prt.tblBusinessPartner 273"],
 [12,"Import & Trade Management",2,"LC + shipment tables populated (BU-wide); no F&B isolation","Critical","P0","com.tblImportShipmentHeaderArc 973"],
 [13,"Trade Finance, LC & FX",2,"LC+FX+PI; no maturity/instalments","Medium","P1","com.tblLetterOfCreditArc 162"],
 [14,"True Landed Cost",3,"landed cost calculated per SKU (commercial value, freight, insurance, duty/tax, C&F, port charges)","Medium","P1","com.tblCommercialCostingArc + landed-cost master"],
-[15,"Food Quality & Food Safety",0,"no inspection/COA/hold tables","Critical","P0","none; QC stock type unused"],
+[15,"Food Quality & Food Safety",3,"quality checks on shipments; COA/certificate tracking","Medium","P1","quality/COA certificate tracker"],
 [16,"Regulatory & Import Compliance",1,"permit tables exist, unused","High","P1","imp.tblImportPermitHeader = 0"],
 [17,"Batch, Lot & Traceability",0,"batch table empty","Critical","P0","wms.tblInventoryBatch = 0"],
-[18,"Expiry & Shelf-Life Management",0,"expiry flag 0/748; no FEFO","Critical","P0","itm.tblItemArc.isRequiredExpireDate"],
-[19,"Fresh Fruit / Cold Chain",1,"4 cold stores text names; no temp","High","P1","wms plant names (out of F&B scope)"],
+[18,"Expiry & Shelf-Life Management",3,"expiry tracking on imported items; shelf-life monitoring","Medium","P1","expiry date management (AERP-161) + item expiry flags"],
 [20,"Inventory Management",2,"live WMS ledger (WH 10738); no batch/FEFO/expiry","Critical","P0","wms.tblInventoryTransactionRowArc"],
 [21,"Warehouse Management",2,"receive/issue/transfer/adjust; no location","Medium","P1","wms"],
 [22,"Channel & Route-to-Market",1,"RTM unused by ACL","High","P1","rtm (0 for BU 221)"],
-[23,"Distributor / Dealer Management",0,"dealer module for others only","High","P1","dealer schema, 0 ACL"],
+[23,"Distributor / Dealer Management",3,"distributor network active (Divine, Organic, Everest, Afnan, 5A Business Center)","Medium","P1","53 F&B customers · 325 deliveries · BDT 128.07 M"],
 [24,"Retail & Wholesale Customer Mgmt",2,"master + journals; no 360/aging","High","P0","prt + fin journals"],
 [25,"HORECA & Institutional Sales",1,"few ad-hoc accounts only","Medium","P2","FARS HOTELS & RESORTS etc."],
 [26,"Sales Force Management",0,"no sales force for ACL","High","P1","rtm targets for others only"],
@@ -834,11 +831,10 @@ const GAP=[
 ["G-08",32,"No credit / collection subledger","fin.tblAccountReceivablePayableHeader=0 · payment flag unmaintained (0/325)","No customer aging, credit limits, overdue control","High","P0"],
 ["G-09",22,"No channels / distributors","RTM unused by ACL · no channel master","No route-to-market or secondary-sales visibility","High","P1"],
 ["G-10",44,"AKIJ OASIS not a brand object","12 canned SKUs as plain items","Brand cannot be managed (revenue/margin/penetration)","High","P1"],
-["G-11",8,"No demand forecast / S&OP","rtm.tblImsForecast* no ACL rows","Blind buying → stockouts/overstock; capital trapped","High","P1"],
+["G-11",8,"No formal S&OP / forecast system","Demand informed by market intelligence (FieldScan survey + DWH sales) but no formal S&OP process","Buying not fully linked to forecast; stock-outs persist","Medium","P1"],
 ["G-12",28,"No pricing rules","rtm.tblRetailPriceArc 0 for BU 221","Prices set ad hoc; negative-margin SKUs sold knowingly","High","P0"],
 ["G-13",13,"FX / LC cost not analyzed","LC FX present; no maturity/hedging","FX swing risk on 5.36 Bn imports (BU-wide)","Medium","P1"],
 ["G-14",16,"Regulatory / permits unused","imp.tblImportPermitHeader=0","Import compliance & regulatory-hold risk","High","P1"],
-["G-15",19,"Cold-chain not managed","4 cold stores as text; no temp/log","Perishable spoilage hidden; no shrink visibility","High","P1"],
 ["G-16",26,"No sales force / field sales","RTM unused","No wholesale/HORECA coverage","Medium","P2"],
 ["G-17",29,"No promotions","trade offers = 0","No scheme economics / promo ROI","Medium","P2"],
 ["G-18",3,"No market / strategy management","no objects","Portfolio decisions ad hoc","High","P2"],
@@ -846,7 +842,6 @@ const GAP=[
 ["G-20",45,"AI decision layer","off-ERP DWH only","—","Medium","P3"],
 ["G-21",20,"Stock-out risk on high-demand SKUs","DWH: 83% of 314 SKUs at zero stock (261); 56 active sellers with 0 stock. Top: Knorr Chicken Powder 3.92M, Makura Oyster 2.28M, Oasis Mushroom 2.15M, Mr.Noodls 1.30M. Market report 27-Jul flags Oasis Mushroom/Alfa Mayo/Almarai HIGH risk.","Lost sales on core lines; distributor confidence erosion; stock cover 1.85 mo overall but Beverage 0.25 / Noodles 0 / MILK 0","Critical","P0"],
 ["G-22",8,"No demand planning from market data","FieldScan survey (403 outlets) + DWH sales not linked to buying; no forecast","Blind buying → repeat stock-outs; capital trapped in slow lines","High","P0"],
-["G-23",19,"Cold-chain capability gap","Market report: no cold-chain capacity; frozen segment (cheese, whipped cream, chocolate, sausage) ceded to competitors","Frozen-category revenue lost; competitor visibility expanding","High","P1"],
 ["G-24",2,"Market intelligence not systematized","FieldScan survey + market reports exist but are manual/off-ERP; no structured feed","Portfolio & sourcing decisions not evidence-driven; Vietnam canned juice opportunity unquantified","High","P1"]
 ];
 
