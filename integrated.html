@@ -526,10 +526,10 @@ td b{color:var(--text)}
     <table>
       <thead><tr><th>Role</th><th>Named Owner</th></tr></thead>
       <tbody>
-        <tr><td>Business Head / Head of Sales (pricing, profitability, demand planning)</td><td><b>Md. Imran Hossen</b></td></tr>
-        <tr><td>Finance Controller (inventory valuation, landed cost, credit/collection)</td><td><b>Md. Sajjad Hossain</b></td></tr>
-        <tr><td>Warehouse Head (FEFO/expiry execution)</td><td><b>Bashir Alam</b></td></tr>
-        <tr><td>IT / ERP owner (system builds: batch module, AR subledger, pricing rules)</td><td><b>H M Omar Hasnain Real</b></td></tr>
+        <tr><td>Business Head / Head of Sales (pricing, profitability, demand planning)</td><td><b>ACL</b></td></tr>
+        <tr><td>Finance Controller (inventory valuation, landed cost, credit/collection)</td><td><b>Finance</b></td></tr>
+        <tr><td>Warehouse Head (FEFO/expiry execution)</td><td><b>Inventory & Distribution</b></td></tr>
+        <tr><td>IT / ERP owner (system builds: batch module, AR subledger, pricing rules)</td><td><b>IT / ERP</b></td></tr>
         <tr><td>Supply Chain / Procurement / Import lead (batch/expiry, import tracking, LC)</td><td><b>CSCO</b></td></tr>
       </tbody>
     </table>
@@ -889,7 +889,7 @@ const sevT={"Critical":"t-crit","High":"t-high","Medium":"t-med","Low":"t-low"};
 const priColor={"P0":"s-red","P1":"s-yellow","P2":"s-green","P3":"s-grey"};
 const stb=document.getElementById("score-tbody");
 const WS_DATE={1:"30-Sep-26",2:"30-Sep-26",3:"15-Sep-26",4:"15-Sep-26",5:"15-Sep-26",6:"15-Sep-26",7:"30-Sep-26",8:"15-Sep-26",9:"15-Sep-26",10:"30-Sep-26",11:"30-Sep-26",12:"30-Sep-26",13:"31-Aug-26",14:"31-Aug-26",15:"30-Sep-26",16:"30-Sep-26",17:"30-Sep-26",18:"30-Sep-26",20:"30-Sep-26",21:"30-Sep-26",22:"30-Sep-26",23:"30-Sep-26",24:"30-Sep-26",25:"30-Sep-26",26:"30-Sep-26",27:"30-Sep-26",28:"30-Sep-26",29:"30-Sep-26",30:"30-Sep-26",31:"30-Sep-26",32:"15-Sep-26",33:"30-Sep-26",34:"30-Sep-26",35:"30-Sep-26",36:"15-Sep-26",37:"15-Sep-26",38:"15-Sep-26",39:"30-Sep-26",40:"30-Sep-26",41:"30-Sep-26",42:"30-Sep-26",43:"30-Sep-26",44:"30-Sep-26",45:"30-Sep-26"};
-const WS_OWNER={1:"Md. Imran Hossen",2:"Md. Imran Hossen",3:"Md. Imran Hossen",4:"Md. Imran Hossen",5:"Md. Imran Hossen",6:"Md. Imran Hossen",7:"CSCO",8:"Md. Imran Hossen",9:"Md. Imran Hossen",10:"CSCO",11:"CSCO",12:"CSCO",13:"Md. Sajjad Hossain",14:"Md. Sajjad Hossain",15:"CSCO",16:"CSCO",17:"Bashir Alam",18:"Bashir Alam",20:"Bashir Alam",21:"Bashir Alam",22:"Md. Imran Hossen",23:"Md. Imran Hossen",24:"Md. Imran Hossen",25:"Md. Imran Hossen",26:"Md. Imran Hossen",27:"Md. Imran Hossen",28:"Md. Imran Hossen + Md. Sajjad Hossain",29:"Md. Imran Hossen",30:"Md. Imran Hossen",31:"Bashir Alam",32:"Md. Imran Hossen",33:"Bashir Alam",34:"Bashir Alam",35:"Md. Imran Hossen",36:"Md. Sajjad Hossain",37:"Md. Imran Hossen",38:"Md. Imran Hossen",39:"Md. Sajjad Hossain",40:"H M Omar Hasnain Real",41:"Md. Imran Hossen",42:"Md. Imran Hossen",43:"H M Omar Hasnain Real",44:"Md. Imran Hossen",45:"H M Omar Hasnain Real"};
+const WS_OWNER={1:"ACL",2:"ACL",3:"ACL",4:"ACL",5:"ACL",6:"ACL",7:"CSCO",8:"ACL",9:"ACL",10:"CSCO",11:"CSCO",12:"CSCO",13:"Finance",14:"Finance",15:"CSCO",16:"CSCO",17:"Inventory & Distribution",18:"Inventory & Distribution",20:"Inventory & Distribution",21:"Inventory & Distribution",22:"ACL",23:"ACL",24:"ACL",25:"ACL",26:"ACL",27:"ACL",28:"ACL + Finance",29:"ACL",30:"ACL",31:"Inventory & Distribution",32:"ACL",33:"Inventory & Distribution",34:"Inventory & Distribution",35:"ACL",36:"Finance",37:"ACL",38:"ACL",39:"Finance",40:"IT / ERP",41:"ACL",42:"ACL",43:"IT / ERP",44:"ACL",45:"IT / ERP"};
 WS.slice().sort((a,b)=>a[2]-b[2]).forEach(w=>{
   const tr=document.createElement("tr");
   const gap=5-w[2];
@@ -927,28 +927,28 @@ renderGaps();
 // chains
 const cl=document.getElementById("chain-list");
 const CHAIN_SCHED={
-"Market → Category":["Md. Imran Hossen","30-Sep-26"],
-"Category → Brand":["Md. Imran Hossen","15-Sep-26"],
-"Brand → SKU":["Md. Imran Hossen","15-Sep-26"],
-"SKU → Demand Forecast":["Md. Imran Hossen","15-Sep-26"],
+"Market → Category":["ACL","30-Sep-26"],
+"Category → Brand":["ACL","15-Sep-26"],
+"Brand → SKU":["ACL","15-Sep-26"],
+"SKU → Demand Forecast":["ACL","15-Sep-26"],
 "Demand → Procurement":["CSCO","30-Sep-26"],
 "Procurement → Import":["CSCO",""],
-"Import → Landed Cost":["Md. Sajjad Hossain","31-Aug-26"],
-"Landed Cost → Inventory":["Md. Sajjad Hossain","30-Sep-26"],
-"Inventory → Batch":["Bashir Alam","30-Sep-26"],
-"Batch → Expiry":["Bashir Alam","30-Sep-26"],
-"Batch → Customer":["Bashir Alam","30-Sep-26"],
-"Customer → Sales":["Md. Imran Hossen","30-Sep-26"],
-"Sales → Collection":["Md. Imran Hossen + Md. Sajjad Hossain",""],
-"SKU → Profitability":["Md. Imran Hossen","30-Sep-26"],
-"Inventory → Working Capital":["Md. Sajjad Hossain","15-Sep-26"],
+"Import → Landed Cost":["Finance","31-Aug-26"],
+"Landed Cost → Inventory":["Finance","30-Sep-26"],
+"Inventory → Batch":["Inventory & Distribution","30-Sep-26"],
+"Batch → Expiry":["Inventory & Distribution","30-Sep-26"],
+"Batch → Customer":["Inventory & Distribution","30-Sep-26"],
+"Customer → Sales":["ACL","30-Sep-26"],
+"Sales → Collection":["ACL + Finance",""],
+"SKU → Profitability":["ACL","30-Sep-26"],
+"Inventory → Working Capital":["Finance","15-Sep-26"],
 "Quality → Supplier Performance":["CSCO","30-Sep-26"],
-"Complaint → Batch Traceability":["Bashir Alam","30-Sep-26"],
-"Strategy → KPI":["Md. Imran Hossen","15-Sep-26"],
-"KPI → Initiative":["Md. Imran Hossen","30-Sep-26"],
-"Exception → Decision":["Md. Imran Hossen","30-Sep-26"],
-"Decision → Action":["Md. Imran Hossen","30-Sep-26"],
-"Action → Outcome → Learning":["Md. Imran Hossen","30-Sep-26"]
+"Complaint → Batch Traceability":["Inventory & Distribution","30-Sep-26"],
+"Strategy → KPI":["ACL","15-Sep-26"],
+"KPI → Initiative":["ACL","30-Sep-26"],
+"Exception → Decision":["ACL","30-Sep-26"],
+"Decision → Action":["ACL","30-Sep-26"],
+"Action → Outcome → Learning":["ACL","30-Sep-26"]
 };
 CHAINS.forEach(([name,st,cause,cons,fix])=>{
   const d=document.createElement("div");d.className="chain";
@@ -970,7 +970,7 @@ const et=document.getElementById("ev-tbody");
 EV.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td><b>${r[0]}</b></td><td>${r[1]}</td><td class="ev">${r[2]}</td><td><span class="tag ${sevT["Medium"]}">${r[3]}</span></td>`;et.appendChild(tr);});
 
 // ---------- CLOSURE SCHEDULE ----------
-const OWNERS={IH:"Md. Imran Hossen",SH:"Md. Sajjad Hossain",BA:"Bashir Alam",HR:"H M Omar Hasnain Real",TBA:"CSCO"};
+const OWNERS={IH:"ACL",SH:"Finance",BA:"Inventory & Distribution",HR:"IT / ERP",TBA:"CSCO"};
 const SCHED_GAP=[
 ["G-02","No batch/lot/expiry (manual today)","BA","30-Sep-26","Batch/expiry register + FEFO release list signed by Warehouse Head","P0"],
 ["G-04","Inventory not valued in books","SH","30-Sep-26","Finance-signed GL reconciliation (ERP stock vs GL)","P0"],
@@ -1025,6 +1025,7 @@ show("overview");
 </script>
 </body>
 </html>
+
 
 
 
