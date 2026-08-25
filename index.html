@@ -29,11 +29,6 @@ button { cursor: pointer; font-family: inherit; } input, select { font-family: i
 .btn-back { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 6px 14px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; transition: all 0.2s; display: none; }
 .btn-back:hover { background: rgba(255,255,255,0.25); }
 .btn-back.show { display: inline-block; }
-.btn-refresh { background: var(--gold); color: var(--primary); border: none; padding: 7px 16px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-.btn-refresh:hover { filter: brightness(1.15); }
-.btn-refresh.loading { opacity: 0.7; pointer-events: none; }
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-.btn-refresh .spinner { display: inline-block; animation: spin 0.8s linear infinite; margin-right: 4px; }
 
 .nav-bar { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 78px; z-index: 99; padding: 0 28px; display: flex; gap: 0; overflow-x: auto; }
 .nav-btn { padding: 13px 22px; border: none; background: none; font-size: 0.83rem; font-weight: 600; color: var(--muted); border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; }
@@ -130,8 +125,7 @@ footer { text-align: center; padding: 20px; font-size: 0.72rem; color: #9ca3af; 
   </div>
   <div class="header-right">
     <button class="btn-back" id="btnBack" onclick="goBack()">← Back</button>
-    <span class="badge" id="header-date"></span>
-    <button class="btn-refresh" id="btnRefresh" onclick="refreshDashboard()">↻ Refresh Data</button>
+    <span class="badge">Aug 2026</span>
   </div>
 </div>
 
@@ -148,8 +142,8 @@ footer { text-align: center; padding: 20px; font-size: 0.72rem; color: #9ca3af; 
 
 <!-- ==================== PAGE: EXECUTIVE OVERVIEW ==================== -->
 <div id="page-overview" class="page active">
-    <div class="alert-banner alert-info">
-      <strong>Aug 2026 (as of Aug 11):</strong> F&amp;B Achievement BDT 34.96 Lakh vs ABP Target BDT 1.90 Cr (18.4%, MTD). Import budget (Jul+Aug) BDT 9.93 Cr vs proposed BDT 4.76 Cr &mdash; <em>under budget</em>. Malaysia landed; China + Thailand pending EC. Data source: DWH (oms.tblSalesOrderHeaderArc) + ACL Customer Profile cross-reference.
+    <div class="alert-banner alert-warn">
+      <strong>Aug 2026 (as of Aug 25):</strong> F&amp;B revenue MTD BDT 0.59 Cr vs ABP target BDT 1.90 Cr (30.8%). July BDT 1.68 Cr (90.2% of target). August gross margin is <u>negative</u>. Stock value BDT 0.31 Cr (81 F&amp;B SKUs). Source: DWH (fin.tblAccountingJournalArc PC 818 · wms ledger net · fin.tblBankJournalHeaderArc).
     </div>
 
   <div class="stats-grid" id="kpi-grid">
@@ -190,30 +184,20 @@ footer { text-align: center; padding: 20px; font-size: 0.72rem; color: #9ca3af; 
 <!-- ==================== PAGE: SALES PERFORMANCE ==================== -->
 <div id="page-sales" class="page">
   <div class="alert-banner alert-info">
-    <strong>Data Source:</strong> August 2026 achievement from DWH (<code>oms.tblSalesOrderHeaderArc</code> for BU 221, filtered by F&amp;B customers matched to salespeople via ACL Customer Profile Google Sheet). Data as of Aug 11, 2026 (MTD). July 2026 actual: BDT 1.33 Cr (71.7% of BDT 1.86 Cr ABP target).
+    <strong>Data Source:</strong> Revenue from DWH <code>fin.tblAccountingJournalArc</code> (PC 818). Category mix from <code>oms.tblSalesOrderRowArc</code> joined to item master (F&amp;B categories only). July journal revenue BDT 1.68 Cr (90.2% of target); August MTD BDT 0.51 Cr (26.9%).
   </div>
 
   <div class="card">
     <div class="card-header">
-      <div>
-        <div class="card-title">Sales Team &amp; ABP Target Allocation (Aug 2026)</div>
-        <div class="card-sub">ABP Target: BDT 1,90,49,403 (Gross) | Salesperson allocation from ABP ratio sheet</div>
-      </div>
-    </div>
-    <div class="salesperson-grid" id="sp-grid"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-header">
-      <div><div class="card-title">Category-wise Performance</div><div class="card-sub">Target vs Achievement by Product Category</div></div>
-      <input type="text" class="search-box" id="sales-search" placeholder="Search category..." oninput="renderSalesTable()">
+      <div><div class="card-title">Category-wise Sales — July &amp; August 2026</div><div class="card-sub">Net sales value by product category (F&amp;B items only, from sales order rows)</div></div>
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Category</th><th class="num">Target (BDT)</th><th class="num">Achieved (BDT)</th><th class="num">Achievement %</th><th>Status</th><th>AI Suggestion</th></tr></thead>
+        <thead><tr><th>Category</th><th class="num">Jul (BDT)</th><th class="num">Aug MTD (BDT)</th><th class="num">FYTD (BDT)</th><th>Trend</th><th>AI Suggestion</th></tr></thead>
         <tbody id="sales-tbody"></tbody>
       </table>
     </div>
+    <div style="padding:8px 0 0;font-size:0.72rem;color:var(--muted);" id="sales-summary"></div>
   </div>
 </div>
 
@@ -364,11 +348,11 @@ footer { text-align: center; padding: 20px; font-size: 0.72rem; color: #9ca3af; 
 
   <div class="card">
     <div class="card-header">
-      <div><div class="card-title">Customer Aging Report &mdash; F&amp;B Only</div><div class="card-sub">Outstanding receivables from deliveries since July 2026. Data: DWH (sms.tblDeliveryHeaderArc) filtered by F&amp;B customers.</div></div>
+      <div><div class="card-title">Customer Delivered Value &mdash; WH 10738 (F&amp;B)</div><div class="card-sub">Cumulative delivered value by customer. <strong style="color:var(--bad)">Aging/payment not computable</strong> — delivery payment posting is not maintained.</div></div>
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Customer</th><th class="num">Total Billed</th><th class="num">Amount Paid</th><th class="num">Outstanding</th><th class="num">Due Date</th><th class="num">Deliveries</th><th>Status</th></tr></thead>
+        <thead><tr><th>Customer</th><th class="num">Delivered Value</th><th class="num">Deliveries</th><th class="num">Last Delivery</th><th>Status</th></tr></thead>
         <tbody id="aging-tbody"></tbody>
       </table>
     </div>
@@ -376,7 +360,7 @@ footer { text-align: center; padding: 20px; font-size: 0.72rem; color: #9ca3af; 
   </div>
 
   <div class="card">
-    <div class="card-header"><div class="card-title">Overdue Analysis</div></div>
+    <div class="card-header"><div class="card-title">Top Customers by Delivered Value</div></div>
     <div class="chart-box" style="box-shadow:none;padding:0;"><div style="height:300px"><canvas id="chartAging"></canvas></div></div>
   </div>
 </div>
@@ -396,7 +380,7 @@ footer { text-align: center; padding: 20px; font-size: 0.72rem; color: #9ca3af; 
     <div class="chart-box" style="box-shadow:none;padding:0;margin-bottom:16px;"><div style="height:300px"><canvas id="chartCollection"></canvas></div></div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Customer</th><th class="num">Entries</th><th class="num">Amount Collected</th><th class="num">Salesperson</th><th>Status</th></tr></thead>
+        <thead><tr><th>Customer</th><th class="num">Entries</th><th class="num">Amount Collected</th><th>Classification</th><th>Status</th></tr></thead>
         <tbody id="coll-tbody"></tbody>
       </table>
     </div>
@@ -406,8 +390,8 @@ footer { text-align: center; padding: 20px; font-size: 0.72rem; color: #9ca3af; 
 
 <!-- ==================== PAGE: FINANCIAL OVERVIEW ==================== -->
 <div id="page-finance" class="page">
-  <div class="alert-banner alert-info">
-    <strong>Profit Center 818 — Food &amp; Beverage</strong> &mdash; Income Statement (Jul Actual + Aug MTD). Data: DWH fin.tblAccountingJournalArc filtered by intProfitCenterId=818.
+  <div class="alert-banner alert-warn">
+    <strong>Profit Center 818 — Food &amp; Beverage</strong> &mdash; Income Statement (Jul + Aug MTD, as of 23 Aug). Revenue &amp; COGS are monthly actuals from <code>fin.tblAccountingJournalArc</code> (PC 818). Opex detail is FYTD total split Jul (closed) / Aug (derived). August gross margin is <u>negative</u> — flagged for Finance review.
   </div>
 
   <div class="stats-grid" id="fin-kpi-grid"></div>
@@ -429,8 +413,8 @@ footer { text-align: center; padding: 20px; font-size: 0.72rem; color: #9ca3af; 
 </div>
 
 <footer>
-  <p>SBU 221 — Akij Commodities Ltd. (ACL) &middot; Profit Center 818 — Food &amp; Beverage</p>
-  <p>Last data refresh: 11 Aug 2026 from DWH &middot; Sources: oms.tblSalesOrderHeaderArc, fin.tblAccountingJournalArc, fin.tblBankJournalHeaderArc, sms.tblDeliveryHeaderArc</p>
+  <p>SBU 221 — Akij Commodities Ltd. (ACL) &middot; Profit Center 818 — Food &amp; Beverage &middot; Data as of August 2026</p>
+  <p>Sources: DWH (oms.tblSalesInvoiceArc, wms.tblInventoryTransactionRowArc, itm.tblItemArc, dco.tblbusinessunitArc) &middot; ABP FY 2026-27 &middot; F&B_ACL_Budget.xlsx &middot; Budget_vs_Proposed_Purchase_August.xlsx &middot; ACL Customer Profile (Google Sheet) &middot; NBR Import Statement</p>
 </footer>
 </body>
 
@@ -497,47 +481,87 @@ function renderPage() {
 
 // ===== DATA LAYER =====
 var STOCK_DATA = [
-  { name: "AKIJ OASIS LIGHT MEAT PREMIUM TUNA FLAKES IN OIL 160GM", qty: 15004, val: 1704157.32, cat: "Canned Food", netSales: 12000, closing: 3004, firstTx: "2025-10-15" },
-  { name: "CARNATION MILK 405GM", qty: 11743, val: 2177139.28, cat: "Baking", netSales: 9000, closing: 2743, firstTx: "2025-11-01" },
-  { name: "AKIJ OASIS LIGHT MEAT TUNA FLAKES IN OIL 160GM", qty: 8833, val: 1003253.91, cat: "Canned Food", netSales: 7000, closing: 1833, firstTx: "2025-10-15" },
-  { name: "AKIJ OASIS LIGHT MEAT TUNA CHUNK IN BRINE 160GM", qty: 8539, val: 969861.33, cat: "Canned Food", netSales: 6500, closing: 2039, firstTx: "2025-11-01" },
-  { name: "NAUTILUS LITE TUNA CHUNK IN OIL 165GM", qty: 4656, val: 1055043.08, cat: "Canned Food", netSales: 3800, closing: 856, firstTx: "2025-12-01" },
-  { name: "AKIJ OASIS LIGHT MEAT TUNA CHUNK IN SOYABEAN OIL 160GM", qty: 4179, val: 474651.66, cat: "Canned Food", netSales: 3400, closing: 779, firstTx: "2025-12-01" },
-  { name: "NAUTILUS LITE TUNA STEAK IN SPRIN WATER 165GM", qty: 4065, val: 921123.31, cat: "Canned Food", netSales: 3300, closing: 765, firstTx: "2025-12-15" },
-  { name: "VIRGINIA G G WHITE OATS 400GM", qty: 3510, val: 1156201.02, cat: "Cereal", netSales: 2800, closing: 710, firstTx: "2026-01-01" },
-  { name: "LOBSTAR FISH SAUCE 285ML", qty: 3366, val: 510519.73, cat: "Sauce & Spread", netSales: 2700, closing: 666, firstTx: "2025-11-15" },
-  { name: "VIRGINIA G G AUSTRALIAN PURE HONEY SQUEEZE 400GM", qty: 3350, val: 1367186.59, cat: "Trading Goods", netSales: 2600, closing: 750, firstTx: "2026-01-15" },
-  { name: "AKIJ OASIS GREEN PEAS (PROCESSED) 400GM", qty: 3255, val: 371018.25, cat: "Canned Food", netSales: 2500, closing: 755, firstTx: "2026-01-15" },
-  { name: "TIPAROS FISH SAUCE 700ML", qty: 2378, val: 838213.37, cat: "Sauce & Spread", netSales: 1900, closing: 478, firstTx: "2026-02-01" },
-  { name: "HEINZ SRIRACHA CHILLI SAUCE 300GM", qty: 2030, val: 263817.43, cat: "Sauce & Spread", netSales: 1600, closing: 430, firstTx: "2026-02-01" },
-  { name: "AKIJ OASIS LIGHT MEAT TUNA CHUNK IN SUNFLOWER OIL 160GM", qty: 1883, val: 213871.52, cat: "Canned Food", netSales: 1500, closing: 383, firstTx: "2026-02-15" },
-  { name: "VIRGINIA G G AUSTRALIAN PURE HONEY SQUEEZE 227GM", qty: 1709, val: 697469.22, cat: "Honey", netSales: 1300, closing: 409, firstTx: "2026-03-01" },
-  { name: "LOBSTAR FISH SAUCE 700ML", qty: 1620, val: 571028.45, cat: "Sauce & Spread", netSales: 1200, closing: 420, firstTx: "2026-03-01" },
-  { name: "VIRGINIA G G SWEET CORN WHOLE KERNEL CORN 425GM/400GM", qty: 1362, val: 198619.10, cat: "Canned Food", netSales: 1000, closing: 362, firstTx: "2026-03-01" },
-  { name: "UNCLE TEMPURA POWDER 500GM", qty: 1066, val: 292792.89, cat: "Baking", netSales: 800, closing: 266, firstTx: "2026-03-15" },
-  { name: "VIRGINIA G G SOY SAUCE-150ML", qty: 846, val: 55154.29, cat: "Sauce & Spread", netSales: 240, closing: 606, firstTx: "2025-09-15" },
-  { name: "100 PLUS DRINKS 325ML ORIGINAL", qty: 777, val: 112002.84, cat: "Beverage & Drinking", netSales: 600, closing: 177, firstTx: "2026-04-01" },
-  { name: "HUP SENG CREAM CRACKERS 125GM", qty: 660, val: 124663.04, cat: "Snacks", netSales: 500, closing: 160, firstTx: "2026-04-01" },
-  { name: "HEINZ SRIRACHA CHILLI SAUCE 600GM", qty: 600, val: 164799.00, cat: "Sauce & Spread", netSales: 450, closing: 150, firstTx: "2026-04-15" },
-  { name: "100 PLUS DRINKS 325ML LEMON LIME", qty: 576, val: 83029.13, cat: "Beverage & Drinking", netSales: 420, closing: 156, firstTx: "2026-04-15" },
-  { name: "AKIJ OASIS WHOLE KERNEL SWEET CORN 400GM", qty: 515, val: 58701.81, cat: "Canned Food", netSales: 380, closing: 135, firstTx: "2026-05-01" },
-  { name: "MOUNTAIN DEW CAN-320ML", qty: 456, val: 65731.40, cat: "Beverage & Drinking", netSales: 350, closing: 106, firstTx: "2026-05-01" },
-  { name: "NAUTILUS LITE SANDWICH TUNA IN SOYABEAN OIIL 165GM", qty: 334, val: 75683.93, cat: "Canned Food", netSales: 250, closing: 84, firstTx: "2026-05-01" },
-  { name: "NAUTILUS LITE SANDWICH TUNA IN SPRIN WATER 165GM", qty: 288, val: 65260.40, cat: "Canned Food", netSales: 210, closing: 78, firstTx: "2026-05-15" },
-  { name: "VIRGINIA G G POMACE OLIVE OIL - 4LTR TIN", qty: 270, val: 377362.56, cat: "Oil", netSales: 0, closing: 270, firstTx: "2025-09-01" },
-  { name: "LACTASOY SOYMILK ORIGINAL 1000ML", qty: 268, val: 122683.67, cat: "Baking", netSales: 200, closing: 68, firstTx: "2026-06-01" },
-  { name: "VIRGINIA G G EXTRA VIRGIN OLIVE OIL 4LTR TIN", qty: 259, val: 289579.69, cat: "Oil", netSales: 0, closing: 259, firstTx: "2025-09-01" },
-  { name: "MUNCHYS FUN MIXED BISCUITS 295GM", qty: 180, val: 79629.26, cat: "Snacks", netSales: 140, closing: 40, firstTx: "2026-06-15" },
-  { name: "LACTASOY SOYMILK UNSWEETENED 1000ML", qty: 176, val: 80568.38, cat: "Baking", netSales: 130, closing: 46, firstTx: "2026-06-15" },
-  { name: "MAGGI SEASONING COCKING SAUCE 680L", qty: 165, val: 56498.59, cat: "Sauce & Spread", netSales: 0, closing: 165, firstTx: "2025-10-01" },
-  { name: "BERTINI BLENDS OF REFINED OILS & EXTRA VIRGIN OLIVE OIL 500ML", qty: 150, val: 167710.25, cat: "Oil", netSales: 100, closing: 50, firstTx: "2026-03-01" },
-  { name: "7 UP CAN-320ML", qty: 139, val: 20036.54, cat: "Beverage & Drinking", netSales: 100, closing: 39, firstTx: "2026-07-01" },
-  { name: "VIRGINIA G G HOT SAUCE-88ML", qty: 63, val: 8575.90, cat: "Sauce & Spread", netSales: 0, closing: 63, firstTx: "2025-09-01" },
-  { name: "MUNCHYS TOP MIXED BISCUITS 295GM", qty: 53, val: 23446.39, cat: "Snacks", netSales: 40, closing: 13, firstTx: "2026-07-01" },
-  { name: "AKIJ OASIS LIGHT MEAT TUNA CHUNK IN SPRING WATER 160GM", qty: 51, val: 5792.59, cat: "Canned Food", netSales: 0, closing: 51, firstTx: "2025-10-01" },
-  { name: "AKIJ OASIS WHOLE MUSHROOM 400GM", qty: 6, val: 529.70, cat: "Canned Food", netSales: 0, closing: 6, firstTx: "2026-01-01" },
-  { name: "AKIJ OASIS WHOLE MUSHROOM 2840GM", qty: 0, val: 0.00, cat: "Canned Food", netSales: 0, closing: 0, firstTx: "2026-01-01" },
-  { name: "SHIITAKE MUSHROOM CHIPS - 50GM BAG", qty: 0, val: 0.00, cat: "Snacks", netSales: 0, closing: 0, firstTx: "2026-02-01" }
+  { name: "NESTLE LACTOGEN 1 BABY MILK INFANT FORMULA - 1650G", qty: 600, val: 1974693, cat: "MILK", movPct: 0 },
+  { name: "CARNATION MILK 405GM", qty: 10303, val: 1910165, cat: "Baking", movPct: 52 },
+  { name: "NESTLE LACTOGEN 2 BABY MILK FOLLOW-UP FORMULA - 1650G", qty: 540, val: 1777224, cat: "MILK", movPct: 28 },
+  { name: "AKIJ OASIS LIGHT MEAT PREMIUM TUNA FLAKES IN OIL 160GM", qty: 14572, val: 1655091, cat: "Canned Food", movPct: 24 },
+  { name: "NESTLE LACTOGEN 2 BABY MILK FOLLOW-UP FORMULA - 650G", qty: 1020, val: 1284299, cat: "MILK", movPct: 0 },
+  { name: "NESTLE LACTOGEN 1 BABY MILK INFANT FORMULA - 650G", qty: 980, val: 1270585, cat: "MILK", movPct: 20 },
+  { name: "NESTLE LACTOGEN 3 BABY MILK FOLLOW-UP FORMULA - 1650G", qty: 368, val: 1211145, cat: "MILK", movPct: 38 },
+  { name: "COCA COLA CAN-320ML", qty: 6004, val: 1085052, cat: "Beverage & Drinking", movPct: 67 },
+  { name: "VIRGINIA G G WHITE OATS 400GM", qty: 3270, val: 1077145, cat: "Cereal", movPct: 45 },
+  { name: "NAUTILUS LITE TUNA CHUNK IN OIL 165GM", qty: 4512, val: 1022413, cat: "Canned Food", movPct: 37 },
+  { name: "AKIJ OASIS LIGHT MEAT TUNA FLAKES IN OIL 160GM", qty: 8833, val: 1003254, cat: "Canned Food", movPct: 54 },
+  { name: "NESTLE LACTOGEN3 BABY MILK FOLLOW-UP FORMULA - 650G", qty: 750, val: 972387, cat: "MILK", movPct: 0 },
+  { name: "AKIJ OASIS LIGHT MEAT TUNA CHUNK IN BRINE 160GM", qty: 8155, val: 926247, cat: "Canned Food", movPct: 51 },
+  { name: "NAUTILUS LITE TUNA STEAK INSPRIN WATER 165GM", qty: 3921, val: 888493, cat: "Canned Food", movPct: 45 },
+  { name: "TIPAROS FISH SAUCE 700ML", qty: 2378, val: 838213, cat: "Sauce & Spread", movPct: 47 },
+  { name: "VIRGINIA G G AUSTRALIAN PURE HONEY SQUEEZE 400GM", qty: 1814, val: 740321, cat: "Trading Goods", movPct: 66 },
+  { name: "SCHEWEPS GINGER SODA -320ML", qty: 3683, val: 619840, cat: "Beverage & Drinking", movPct: 33 },
+  { name: "LOBSTAR FISH SAUCE 700ML", qty: 1596, val: 562569, cat: "Sauce & Spread", movPct: 11 },
+  { name: "LOBSTAR FISH SAUCE 285ML", qty: 3366, val: 510520, cat: "Sauce & Spread", movPct: 69 },
+  { name: "SCHEWEPS SODA WATER-320ML", qty: 3001, val: 505061, cat: "Beverage & Drinking", movPct: 44 },
+  { name: "SCHEWEPS LEMON LIME-320ML", qty: 2886, val: 485469, cat: "Beverage & Drinking", movPct: 20 },
+  { name: "GATORADE SPORTS DRINKS LEMON 500ML", qty: 1800, val: 482453, cat: "Beverage & Drinking", movPct: 0 },
+  { name: "MUNCHY'S TOP MIXED BISCUITS 700GM", qty: 300, val: 392695, cat: "Snacks", movPct: 33 },
+  { name: "AKIJ OASIS GREEN PEAS (PROCESSED) 400GM", qty: 3255, val: 371018, cat: "Canned Food", movPct: 46 },
+  { name: "AKIJ OASIS LIGHT MEAT TUNA CHUNK IN SOYABEAN OIL 160GM", qty: 3219, val: 365615, cat: "Canned Food", movPct: 81 },
+  { name: "VIRGINIA G G POMACE OLIVE OIL - 4LTR TIN", qty: 242, val: 338229, cat: "Oil", movPct: 39 },
+  { name: "COCA ZERO CAN-320ML", qty: 1800, val: 325376, cat: "Beverage & Drinking", movPct: 50 },
+  { name: "GATORADE SPORTS DRINKS GRAPE 500ML", qty: 1182, val: 316811, cat: "Beverage & Drinking", movPct: 0 },
+  { name: "MUNCHY'S FUN MIXED BISCUITS 700GM", qty: 240, val: 314156, cat: "Snacks", movPct: 38 },
+  { name: "HEALTH PARADISE INSTANT OATS 500GM", qty: 587, val: 313313, cat: "Cereal", movPct: 71 },
+  { name: "MUNCHY'S FUN MIXED BISCUITS 295GM", qty: 588, val: 305971, cat: "Snacks", movPct: 17 },
+  { name: "SPRITE CAN-320ML", qty: 1584, val: 286330, cat: "Beverage & Drinking", movPct: 67 },
+  { name: "SCHEWEPS TONIC SODA WATER-320ML", qty: 1680, val: 282740, cat: "Beverage & Drinking", movPct: 30 },
+  { name: "HEINZ SRIRACHA CHILLI SAUCE 300GM", qty: 2030, val: 263817, cat: "Sauce & Spread", movPct: 54 },
+  { name: "MUNCHY'S TOP MIXED BISCUITS 295GM", qty: 473, val: 256445, cat: "Snacks", movPct: 34 },
+  { name: "NESCAFÉ COFFEE DRINKS MOCHA 240ML", qty: 1794, val: 246014, cat: "Beverage & Drinking", movPct: 40 },
+  { name: "GATORADE SPORTS DRINKS BLUE BOLT 500ML", qty: 840, val: 225145, cat: "Beverage & Drinking", movPct: 0 },
+  { name: "UNCLE TEMPURA POWDER 500GM", qty: 778, val: 213689, cat: "Baking", movPct: 88 },
+  { name: "MUNCHEY'S OATS CRUNCH DARK CHOCOLATE 208 G", qty: 472, val: 182410, cat: "Snacks", movPct: 66 },
+  { name: "HEINZ SRIRACHA CHILLI SAUCE 600GM", qty: 600, val: 164799, cat: "Sauce & Spread", movPct: 0 },
+  { name: "NESCAFÉ COFFEE DRINKS ORIGINAL 240ML", qty: 1200, val: 164558, cat: "Beverage & Drinking", movPct: 60 },
+  { name: "MUNCHEY'S OATS CRUNCH STRAWBERRY 208 GM", qty: 424, val: 163860, cat: "Snacks", movPct: 63 },
+  { name: "MUNCHY'S LEXUS CHOCOLATE COATED BISCUITS 190GM POLY PACK", qty: 420, val: 149224, cat: "Snacks", movPct: 30 },
+  { name: "100 PLUS DRINKS 325ML ZERO SUGAR", qty: 810, val: 146419, cat: "Beverage & Drinking", movPct: 42 },
+  { name: "HEALTH PARADISE ROLLED OATS 500GM", qty: 242, val: 129174, cat: "Cereal", movPct: 86 },
+  { name: "7 UP CAN-320ML", qty: 739, val: 128495, cat: "Beverage & Drinking", movPct: 38 },
+  { name: "MUNCHY'S LEXUS PEANUT BISCUITS 190GM POLY PACK", qty: 360, val: 127906, cat: "Snacks", movPct: 57 },
+  { name: "MUNCHY'S LEXUS CHEESE BISCUITS 190GM POLY PACK", qty: 360, val: 127906, cat: "Snacks", movPct: 33 },
+  { name: "HUP SENG CREAM CRACKERS 125GM", qty: 660, val: 124663, cat: "Snacks", movPct: 21 },
+  { name: "MUNCHY'S LEXUS ORIGINAL COOKIES 189GM", qty: 350, val: 124353, cat: "Snacks", movPct: 41 },
+  { name: "MUNCHY'S LEXUS CHOCOLATE CREAM BISCUITS 190GM POLY PACK", qty: 348, val: 123643, cat: "Snacks", movPct: 36 },
+  { name: "LACTASOY SOYMILK ORIGINAL 1000ML", qty: 268, val: 122684, cat: "Baking", movPct: 54 },
+  { name: "MUNCHY'S LEXUS VEGETABLE CRACKERS 200GM POLY PACK", qty: 300, val: 112198, cat: "Snacks", movPct: 64 },
+  { name: "SUNQUICK CONCENTRADE LEMON JUICE 700ML", qty: 270, val: 100979, cat: "Beverage & Drinking", movPct: 31 },
+  { name: "SUNQUICK CONCENTRAD BLACKCURRENT JUICE 700ML", qty: 270, val: 100979, cat: "Beverage & Drinking", movPct: 31 },
+  { name: "NESCAFÉ COFFEE DRINKS LATTE 240ML", qty: 720, val: 98735, cat: "Beverage & Drinking", movPct: 70 },
+  { name: "SUNQUICK CONCENTRADE ORANGE JUICE 700ML", qty: 258, val: 96491, cat: "Beverage & Drinking", movPct: 34 },
+  { name: "PEPSI COLA (REGULAR) CAN-320ML", qty: 471, val: 85140, cat: "Beverage & Drinking", movPct: 77 },
+  { name: "100 PLUS DRINKS 325ML LEMON LIME", qty: 576, val: 83029, cat: "Beverage & Drinking", movPct: 60 },
+  { name: "LACTASOY SOYMILK UNSWEETENED 1000ML", qty: 176, val: 80568, cat: "Baking", movPct: 58 },
+  { name: "AKIJ OASIS LIGHT MEAT TUNA CHUNK IN SUNFLOWER OIL 160GM", qty: 657, val: 74622, cat: "Canned Food", movPct: 96 },
+  { name: "SUNQUICK CONCENTRADE MANGO JUICE 700ML", qty: 186, val: 69563, cat: "Beverage & Drinking", movPct: 36 },
+  { name: "SUNQUICK CONCENTRADE TROPICAL JUICE 700ML", qty: 180, val: 67319, cat: "Beverage & Drinking", movPct: 40 },
+  { name: "SUNQUICK CONCENTRADE MANDARIN JUICE 700ML", qty: 168, val: 62831, cat: "Beverage & Drinking", movPct: 42 },
+  { name: "FANTA CAN (ORANGE)-320ML", qty: 337, val: 60808, cat: "Beverage & Drinking", movPct: 84 },
+  { name: "100 PLUS DRINKS 325ML ORIGINAL", qty: 417, val: 60110, cat: "Beverage & Drinking", movPct: 65 },
+  { name: "MOUNTAIN DEW CAN-320ML", qty: 335, val: 52683, cat: "Beverage & Drinking", movPct: 86 },
+  { name: "NAUTILUS LITE SANDWICH TUNA IN SOYABEAN OIIL 165GM", qty: 190, val: 43054, cat: "Canned Food", movPct: 84 },
+  { name: "NAUTILUS LITE SANDWICH TUNA IN SPRIN WATER 165GM", qty: 144, val: 32630, cat: "Canned Food", movPct: 88 },
+  { name: "VIRGINIA G G SOY SAUCE-150ML", qty: 366, val: 23861, cat: "Sauce & Spread", movPct: 85 },
+  { name: "MAGGI SEASONING COCKING SAUCE 680L", qty: 60, val: 20545, cat: "Sauce & Spread", movPct: 99 },
+  { name: "HEINZ CHILLI SAUCE 600GM", qty: 18, val: 4944, cat: "Sauce & Spread", movPct: 98 },
+  { name: "AKIJ OASIS WHOLE KERNEL SWEET CORN 400GM", qty: 35, val: 3989, cat: "Canned Food", movPct: 100 },
+  { name: "FANTA CAN (GRAPE)-320ML", qty: 23, val: 3755, cat: "Beverage & Drinking", movPct: 95 },
+  { name: "VIRGINIA G G EXTRA VIRGIN OLIVE OIL 4LTR TIN", qty: 3, val: 3354, cat: "Oil", movPct: 100 },
+  { name: "VIRGINIA G G SWEET CORN WHOLE KERNEL CORN 425GM/400GM", qty: 18, val: 2625, cat: "Canned Food", movPct: 99 },
+  { name: "VIRGINIA G G MUSHROOM WHOLE 400GM", qty: 10, val: 1098, cat: "Canned Food", movPct: 100 },
+  { name: "VIRGINIA G G SLICED BLACK OLIVES-340GM", qty: 6, val: 473, cat: "Canned Food", movPct: 99 },
+  { name: "FANTA CAN (STRAWBERRY)-320ML", qty: 2, val: 288, cat: "Beverage & Drinking", movPct: 100 },
+  { name: "SHIITAKE MUSHROOM CHIPS - 50GM BAG", qty: 0, val: 0, cat: "Snacks", movPct: 100 },
+  { name: "AKIJ OASIS WHOLE MUSHROOM 2840GM", qty: 0, val: 0, cat: "Canned Food", movPct: 100 }
 ];
 
 var ABP_TARGETS = {
@@ -546,11 +570,18 @@ var ABP_TARGETS = {
   'Mar-27': 33048927, 'Apr-27': 29333327, 'May-27': 42407012, 'Jun-27': 50741150
 };
 
-var SALESPEOPLE = [
-  { name: 'Abul Hasnat Mohammad Rafique', role: 'DSM', loc: 'Dhaka', ratio: 0.35, enroll: '566555', customers: 15, achieved: 478800, orders: 1 },
-  { name: 'Md Tarequr Rahman', role: 'ASM', loc: 'Dhaka', ratio: 0.22, enroll: '566557', customers: 20, achieved: 1225459, orders: 3 },
-  { name: 'Md Mamunur Rashid', role: 'TSM', loc: 'Dhaka', ratio: 0.21, enroll: '569004', customers: 16, achieved: 1314184, orders: 6 },
-  { name: 'Idris Howlader', role: 'TSM', loc: 'Chattogram', ratio: 0.22, enroll: '568987', customers: 15, achieved: 477460, orders: 7 }
+var SALES_BY_CAT = [
+  { cat: 'Sauce & Spread', jul: 9953160, aug: 864640 },
+  { cat: 'Baking', jul: 5363726, aug: 1127636 },
+  { cat: 'Canned Food', jul: 2915184, aug: 1577279 },
+  { cat: 'Noodles', jul: 1243940, aug: 55500 },
+  { cat: 'Beverage & Drinking', jul: 924793, aug: 113350 },
+  { cat: 'MILK', jul: 870225, aug: 0 },
+  { cat: 'Oil', jul: 203340, aug: 986000 },
+  { cat: 'Cereal', jul: 152640, aug: 69960 },
+  { cat: 'Snacks', jul: 114120, aug: 53400 },
+  { cat: 'Honey', jul: 51480, aug: 321585 },
+  { cat: 'Trading Goods (honey)', jul: 67200, aug: 823560 }
 ];
 
 var CATEGORY_TARGETS = {
@@ -559,29 +590,22 @@ var CATEGORY_TARGETS = {
   'Honey': 0.05, 'Oil': 0.06, 'Other': 0.03
 };
 
-// ===== CLASSIFICATION ENGINE (CRM Pattern: AI Logic) =====
+// ===== CLASSIFICATION ENGINE (movement % from ledger: issued ÷ received) =====
 function classifySku(item) {
-  var now = new Date('2026-07-01');
-  var firstDate = new Date(item.firstTx);
-  var daysSince = (now - firstDate) / (1000 * 60 * 60 * 24);
-  if (daysSince < 45) return { band: 'Too New', pct: 0 };
-  var total = item.netSales + item.closing;
-  var movPct = total > 0 ? Math.round((item.netSales / total) * 100) : 0;
-  if (item.closing === 0 && item.netSales > 0) return { band: 'Fully Sold', pct: 100 };
-  if (movPct === 0) return { band: 'Dead Stock', pct: 0 };
-  if (movPct < 15) return { band: 'Slow Moving', pct: movPct };
-  if (movPct < 40) return { band: 'Moderate Moving', pct: movPct };
-  return { band: 'Fast Moving', pct: movPct };
+  if (item.qty <= 0) return { band: 'Fully Sold', pct: 100 };
+  var m = item.movPct || 0;
+  if (m === 0) return { band: 'Dead Stock', pct: 0 };
+  if (m < 15) return { band: 'Slow Moving', pct: m };
+  if (m < 40) return { band: 'Moderate Moving', pct: m };
+  return { band: 'Fast Moving', pct: m };
 }
 
 function getAiSuggestion(item, band) {
-  var now = new Date('2026-07-01');
-  var daysHeld = Math.round((now - new Date(item.firstTx)) / (1000 * 60 * 60 * 24));
-  if (band === 'Dead Stock') return 'Critical: No movement for ' + daysHeld + ' days. Consider liquidation or promotional bundling.';
+  if (item.val === 0 && item.qty > 0) return 'No cost rate in item master — value unrecorded. Flag for master-data fix.';
+  if (band === 'Dead Stock') return 'Zero movement. Review for liquidation or promotional bundling.';
   if (band === 'Slow Moving') return 'Under 15% throughput. Reduce reorder qty or run limited-time offer.';
   if (band === 'Moderate Moving') return 'Steady turnover. Monitor monthly to maintain optimal stock level.';
   if (band === 'Fully Sold') return 'Inventory exhausted. Expedite reorder if demand sustained.';
-  if (band === 'Too New') return 'Recently listed (<45 days). Allow more time for sales pattern to emerge.';
   return 'Strong velocity. Maintain stock depth and consider volume discount to buyers.';
 }
 
@@ -611,8 +635,8 @@ function buildOverview() {
   var importTotal = 50241601;
 
   document.getElementById('kpi-target').textContent = fmtBDT(ABP_TARGETS['Aug-26']);
-  document.getElementById('kpi-achieved').textContent = fmtBDT(3495902);
-  document.getElementById('kpi-ach-pct').textContent = '18.4% of target (MTD Aug 11)';
+  document.getElementById('kpi-achieved').textContent = fmtBDT(5858509);
+  document.getElementById('kpi-ach-pct').textContent = '30.8% of target (MTD Aug 25)';
   document.getElementById('kpi-stockval').textContent = fmtBDT(totalVal);
   document.getElementById('kpi-stock-items').textContent = fnbItems.length + ' items / ' + fmtNum(totalQty) + ' units';
   document.getElementById('kpi-import').textContent = 'BDT 4.76 Cr';
@@ -642,13 +666,15 @@ function buildOverview() {
   }
 
   var alerts = [];
-  alerts.push({ type: 'info', msg: 'August Achievement (MTD to Aug 11): BDT 34.96 Lakh vs ABP target BDT 1.90 Cr (18.4%). 17 orders from 9 active F&amp;B customers. On calendar-pace track (11/31 days = 35% of month elapsed).' });
-  if (deadItems.length > 3) alerts.push({ type: 'bad', msg: deadItems.length + ' items classified as Dead Stock. Combined value: ' + fmtBDT(deadItems.reduce(function(s,i){return s+i.val;},0)) + '. Consider liquidation.' });
-  if (fastItems.length > 5) alerts.push({ type: 'good', msg: fastItems.length + ' items moving fast (40%+ throughput). Ensure reorder pipeline to avoid stockout.' });
+  alerts.push({ type: 'bad', msg: 'August revenue MTD (to Aug 25): BDT 0.59 Cr vs BDT 1.90 Cr target (30.8%). At July\'s daily run-rate, August closes near BDT 1.6 Cr — still short of plan. Escalate to Sales for a recovery plan.' });
+  alerts.push({ type: 'bad', msg: 'August gross margin is NEGATIVE (COGS BDT 0.62 Cr > revenue BDT 0.59 Cr). July GM was only 5.0%. Confirm whether recent imports are being sold below landed cost, or billing is lagged.' });
+  alerts.push({ type: 'info', msg: 'July revenue BDT 1.68 Cr = 90.2% of BDT 1.86 Cr target. FYTD (Jul+Aug) revenue BDT 2.26 Cr vs annual ABP BDT 42.11 Cr.' });
+  if (deadItems.length > 0) alerts.push({ type: 'warn', msg: deadItems.length + ' items with zero movement (dead stock). Combined value: ' + fmtBDT(deadItems.reduce(function(s,i){return s+i.val;},0)) + '. Consider liquidation.' });
   var slowItems = fnbItems.filter(function(i) { return i.band === 'Slow Moving'; });
-  if (slowItems.length > 3) alerts.push({ type: 'warn', msg: slowItems.length + ' items moving slowly (<15% throughput). Combined value: ' + fmtBDT(slowItems.reduce(function(s,i){return s+i.val;},0)) + '. Review reorder decisions.' });
-  alerts.push({ type: 'good', msg: 'Import Pipeline: Gross budget utilization at 48% (BDT 4.76 Cr of BDT 9.93 Cr). Cumulative Jul+Aug imports are UNDER budget. Only 3 of 14 categories active.' });
-  alerts.push({ type: 'info', msg: 'FY 26-27 annual revenue target: BDT 42.11 Cr. July actual: BDT 1.33 Cr (71.7% of BDT 1.86 Cr target). Sep target spikes to BDT 4.57 Cr (+140% MoM).' });
+  if (slowItems.length > 0) alerts.push({ type: 'warn', msg: slowItems.length + ' slow-moving items (<15% throughput). Combined value: ' + fmtBDT(slowItems.reduce(function(s,i){return s+i.val;},0)) + '. Review reorder decisions.' });
+  alerts.push({ type: 'warn', msg: 'Stock value shows BDT 0.31 Cr but 7 dead-stock SKUs (Lactogen 1/2/3 650G, Gatorade Lemon/Grape/Blue Bolt, Heinz Sriracha 600GM) have zero movement — true value is at risk of expiry.' });
+  alerts.push({ type: 'good', msg: 'August F&B collections BDT 0.81 Cr (bank journal, to Aug 25) — ahead of the 0.59 Cr sales figure, implying prior-period receivables are being collected or August sales are under-billed.' });
+  alerts.push({ type: 'bad', msg: 'Receivables/aging is UNRELIABLE: all 325 WH-10738 deliveries (BDT 12.81 Cr cumulative) are flagged unpaid in the delivery header — payment posting is not maintained. Fix before credit decisions.' });
 
   var alertHtml = '';
   alerts.forEach(function(a) {
@@ -659,63 +685,38 @@ function buildOverview() {
 
 // ===== PAGE 2: SALES PERFORMANCE =====
 function buildSalesPage() {
-  var augTarget = ABP_TARGETS['Aug-26'];
-  var spHtml = '';
-  SALESPEOPLE.forEach(function(sp) {
-    var spTarget = Math.round(augTarget * sp.ratio);
-    var achPct = spTarget > 0 ? Math.round((sp.achieved / spTarget) * 100) : 0;
-    var pctColor = achPct >= 30 ? '#059669' : achPct >= 15 ? '#d97706' : '#dc2626';
-    spHtml += '<div class="sp-card">' +
-      '<h4>' + sp.name + '</h4>' +
-      '<div class="role">' + sp.role + ' · ' + sp.loc + ' · ID: ' + sp.enroll + '</div>' +
-      '<div class="sp-stats">' +
-        '<div class="sp-stat"><span>Aug Target</span><b>' + fmtBDT(spTarget) + '</b></div>' +
-        '<div class="sp-stat"><span>Achieved (MTD)</span><b style="color:' + pctColor + '">' + fmtBDT(sp.achieved) + '</b></div>' +
-        '<div class="sp-stat"><span>% of Target</span><b style="color:' + pctColor + '">' + achPct + '%</b></div>' +
-        '<div class="sp-stat"><span>Orders</span><b>' + sp.orders + ' / ' + sp.customers + ' customers</b></div>' +
-      '</div>' +
-    '</div>';
-  });
-  document.getElementById('sp-grid').innerHTML = spHtml;
   renderSalesTable();
 }
 
 function renderSalesTable() {
-  var augTarget = ABP_TARGETS['Aug-26'];
-  var q = (document.getElementById('sales-search') || {}).value || '';
-  var fnbItems = STOCK_DATA.filter(function(i) { return i.qty > 0; });
-  var catMap = {};
-  fnbItems.forEach(function(i) {
-    if (!catMap[i.cat]) catMap[i.cat] = { stockVal: 0, items: 0 };
-    catMap[i.cat].stockVal += i.val;
-    catMap[i.cat].items += 1;
-  });
-  var totalStockVal = Object.keys(catMap).reduce(function(s, k) { return s + catMap[k].stockVal; }, 0);
-  var cats = Object.keys(catMap).sort(function(a, b) { return catMap[b].stockVal - catMap[a].stockVal; });
+  var rows = SALES_BY_CAT.slice().sort(function(a, b) { return (b.jul + b.aug) - (a.jul + a.aug); });
+  var totalJul = rows.reduce(function(s, r) { return s + r.jul; }, 0);
+  var totalAug = rows.reduce(function(s, r) { return s + r.aug; }, 0);
+  var totalFytd = totalJul + totalAug;
   var html = '';
-  cats.forEach(function(cat) {
-    var weight = CATEGORY_TARGETS[cat] || (catMap[cat].stockVal / totalStockVal);
-    var catTarget = Math.round(augTarget * weight);
-    var catAchieved = Math.round(catTarget * (0.65 + Math.random() * 0.35));
-    var pct = Math.round((catAchieved / catTarget) * 100);
-    var pctClass = pct >= 100 ? 'badge-green' : pct >= 70 ? 'badge-amber' : 'badge-red';
+  rows.forEach(function(r) {
+    var fytd = r.jul + r.aug;
+    var trend = r.aug > r.jul ? '<span class="tag tag-fast">UP MoM</span>' : '<span class="tag tag-slow">DOWN MoM</span>';
     var aiSug = '';
-    if (pct >= 110) aiSug = 'Top performing category. Consider increasing allocation and expanding depth.';
-    else if (pct >= 90) aiSug = 'On track. Sustain current strategy, upsell to existing accounts.';
-    else if (pct >= 70) aiSug = 'Close to target. Prioritize high-volume accounts, run trade promotion.';
-    else if (pct >= 50) aiSug = 'Behind target. Increase sales visits, activate dormant distributors.';
-    else aiSug = 'Critical gap. Review pricing, promotion, and channel strategy.';
-    if (q && cat.toLowerCase().indexOf(q.toLowerCase()) < 0) return;
-    html += '<tr class="clickable" onclick="filterInventoryByCategory(\'' + cat.replace(/'/g, "\\'") + '\')">' +
-      '<td><strong>' + cat + '</strong></td>' +
-      '<td class="num">' + fmtBDT(catTarget) + '</td>' +
-      '<td class="num">' + fmtBDT(catAchieved) + '</td>' +
-      '<td class="num"><span class="badge ' + pctClass + '">' + pct + '%</span></td>' +
-      '<td>' + (pct >= 100 ? '<span class="tag tag-fast">ON TRACK</span>' : pct >= 70 ? '<span class="tag tag-moderate">ATTENTION</span>' : '<span class="tag tag-slow">AT RISK</span>') + '</td>' +
+    if (r.aug === 0) aiSug = 'No August sales yet — check if the line is still active.';
+    else if (r.aug < r.jul * 0.3) aiSug = 'Sharp MoM drop — investigate pipeline or stockout.';
+    else if (r.aug > r.jul) aiSug = 'Growing — protect stock depth.';
+    else aiSug = 'Stable. Monitor monthly.';
+    html += '<tr>' +
+      '<td><strong>' + r.cat + '</strong></td>' +
+      '<td class="num">' + fmtBDT(r.jul) + '</td>' +
+      '<td class="num">' + fmtBDT(r.aug) + '</td>' +
+      '<td class="num">' + fmtBDT(fytd) + '</td>' +
+      '<td>' + trend + '</td>' +
       '<td><div class="ai-tip">' + aiSug + '</div></td>' +
     '</tr>';
   });
+  html += '<tr style="background:#f0fdf4;font-weight:700"><td><strong>TOTAL (order rows)</strong></td>' +
+    '<td class="num">' + fmtBDT(totalJul) + '</td>' +
+    '<td class="num">' + fmtBDT(totalAug) + '</td>' +
+    '<td class="num">' + fmtBDT(totalFytd) + '</td><td></td><td></td></tr>';
   document.getElementById('sales-tbody').innerHTML = html;
+  document.getElementById('sales-summary').innerHTML = 'Note: category totals are order-level net values (Jul ' + fmtBDT(totalJul) + ' · Aug ' + fmtBDT(totalAug) + '). Journal revenue (authoritative) is Jul BDT 1.68 Cr / Aug BDT 0.59 Cr — the gap reflects open/unbilled orders.';
 }
 
 function filterInventoryByCategory(cat) {
@@ -825,84 +826,92 @@ function renderInventoryTable() {
 
 function showDetailMode(name) { /* Reserved for future drill-down */ }
 
-// ===== AGING DATA FROM DWH =====
+// ===== AGING DATA FROM DWH (WH 10738, top 20 by delivered value) =====
+// NOTE: isPaymentReceived is 0 for ALL 322 deliveries -> payment posting NOT maintained. "Outstanding" = cumulative delivered value, NOT true receivable.
 var AGING_DATA = [
-  { customer: 'ORGANIC TRADE INTERNATIONAL', billed: 6065505, paid: 0, outstanding: 6065505, dueDate: '2026-09-10', deliveries: 3 },
-  { customer: 'M/S AFNAN TRADE INTERNATIONAL', billed: 1791387, paid: 0, outstanding: 1791387, dueDate: '2026-09-08', deliveries: 3 },
-  { customer: 'EVEREST TRADE INTERNATIONAL', billed: 1080624, paid: 0, outstanding: 1080624, dueDate: '2026-09-08', deliveries: 5 },
-  { customer: 'ANISHA ENTERPRISE', billed: 989620, paid: 0, outstanding: 989620, dueDate: '2026-09-02', deliveries: 3 },
-  { customer: 'M/S RENA ENTERPRISE', billed: 860678, paid: 0, outstanding: 860678, dueDate: '2026-09-02', deliveries: 11 },
-  { customer: 'M/S PROTHI ENTERPRISE', billed: 53290, paid: 0, outstanding: 53290, dueDate: '2026-08-09', deliveries: 1 },
-  { customer: 'M/S SUMON ENTERPRISE', billed: 31680, paid: 0, outstanding: 31680, dueDate: '2026-08-10', deliveries: 1 }
+  { customer: 'DIVINE TRADE INTERNATIONAL', billed: 38180190, deliveries: 27, lastDel: '2026-08-24' },
+  { customer: 'ORGANIC TRADE INTERNATIONAL', billed: 23934598, deliveries: 18, lastDel: '2026-08-11' },
+  { customer: 'EVEREST TRADE INTERNATIONAL', billed: 9374283, deliveries: 30, lastDel: '2026-08-19' },
+  { customer: '5A BUSINESS CENTER', billed: 6837887, deliveries: 14, lastDel: '2026-04-06' },
+  { customer: 'M/S AFNAN TRADE INTERNATIONAL', billed: 4869507, deliveries: 4, lastDel: '2026-08-09' },
+  { customer: 'TAPOSH TRADERS', billed: 4769074, deliveries: 8, lastDel: '2026-05-21' },
+  { customer: 'M/S TAMZID ENTERPRISE', billed: 4089817, deliveries: 7, lastDel: '2026-04-06' },
+  { customer: 'ABDULLAH TRADERS', billed: 3665915, deliveries: 7, lastDel: '2026-01-17' },
+  { customer: 'M/S RENA ENTERPRISE', billed: 3552555, deliveries: 24, lastDel: '2026-08-24' },
+  { customer: 'M/S ABBAS & BROTHERS', billed: 2716706, deliveries: 22, lastDel: '2026-07-20' },
+  { customer: 'DHAKA TRADERS & SUPPLIERS', billed: 2297336, deliveries: 15, lastDel: '2026-07-19' },
+  { customer: 'MOTALEB STORE', billed: 1748200, deliveries: 5, lastDel: '2026-04-01' },
+  { customer: 'S.A TRADE INTERNATIONAL', billed: 1607493, deliveries: 8, lastDel: '2026-06-23' },
+  { customer: 'M AND Z ENTERPRISE', billed: 1330316, deliveries: 10, lastDel: '2026-04-06' },
+  { customer: 'M/S SAMIR AFNAN TRADE INTERNATIONAL', billed: 1289180, deliveries: 2, lastDel: '2026-05-14' },
+  { customer: 'BISMILLAH TRADE INTERNATIONAL', billed: 1269144, deliveries: 5, lastDel: '2026-08-19' },
+  { customer: 'ANISHA ENTERPRISE', billed: 1187620, deliveries: 4, lastDel: '2026-08-03' },
+  { customer: 'M/S THREE BROTHERS STORE', billed: 926772, deliveries: 6, lastDel: '2026-04-01' },
+  { customer: 'M/S KAWSAR ENTERPRISE', billed: 917593, deliveries: 5, lastDel: '2026-06-10' },
+  { customer: 'SHAHABUDDIN & BROTHERS', billed: 820496, deliveries: 9, lastDel: '2026-08-24' }
 ];
 
 function buildAgingPage() {
-  var today = new Date('2026-08-11');
-  var totalOutstanding = 0;
-  var overdueAmount = 0;
+  var totalBilled = 128065874; // 53 customers, 325 deliveries (WH 10738, Oct-2025 → Aug-2026)
   var html = '';
   var i;
   for (i = 0; i < AGING_DATA.length; i++) {
     var a = AGING_DATA[i];
-    totalOutstanding += a.outstanding;
-    var dueDate = new Date(a.dueDate);
-    var isOverdue = dueDate < today;
-    if (isOverdue) overdueAmount += a.outstanding;
-    var daysLeft = Math.round((dueDate - today) / (1000 * 60 * 60 * 24));
-    var status = isOverdue ? '<span class="tag tag-slow">OVERDUE: ' + Math.abs(daysLeft) + ' days</span>' : '<span class="tag tag-fast">Due in ' + daysLeft + ' days</span>';
     html += '<tr>' +
       '<td><strong>' + a.customer + '</strong></td>' +
       '<td class="num">' + fmtBDT(a.billed) + '</td>' +
-      '<td class="num">' + fmtBDT(a.paid) + '</td>' +
-      '<td class="num" style="font-weight:700;color:' + (isOverdue ? 'var(--bad)' : 'var(--good)') + '">' + fmtBDT(a.outstanding) + '</td>' +
-      '<td class="num">' + a.dueDate + '</td>' +
       '<td class="num">' + a.deliveries + '</td>' +
-      '<td>' + status + '</td>' +
+      '<td class="num">' + a.lastDel + '</td>' +
+      '<td><span class="tag tag-slow">PAYMENT NOT POSTED</span></td>' +
     '</tr>';
   }
   document.getElementById('aging-tbody').innerHTML = html;
-  document.getElementById('aging-summary').innerHTML = 'Total Outstanding: <strong>' + fmtBDT(totalOutstanding) + '</strong> | Overdue: <strong style="color:var(--bad)">' + fmtBDT(overdueAmount) + '</strong> | 7 F&amp;B customers | Data: DWH delivery records';
+  document.getElementById('aging-summary').innerHTML = 'Cumulative delivered value (WH 10738, Oct-2025 → Aug-2026): <strong>' + fmtBDT(totalBilled) + '</strong> across 53 customers / 325 deliveries. <strong style="color:var(--bad)">Receivables aging is NOT reliable</strong> — payment posting (isPaymentReceived) is not maintained on delivery records. Use the GL Trade-Receivable balance instead.';
 
-  // KPI cards
-  document.getElementById('aging-kpi-grid').innerHTML = 
-    '<div class="stat-card"><div class="label">Total Outstanding (F&B)</div><div class="value">' + fmtBDT(totalOutstanding) + '</div><div class="sub">7 active F&B customers</div></div>' +
-    '<div class="stat-card red"><div class="label">Overdue Amount</div><div class="value">' + fmtBDT(overdueAmount) + '</div><div class="sub">' + AGING_DATA.filter(function(x) { return new Date(x.dueDate) < today; }).length + ' overdue accounts</div></div>' +
-    '<div class="stat-card amber"><div class="label">Due This Month</div><div class="value">' + fmtBDT(AGING_DATA.filter(function(x) { var d = new Date(x.dueDate); return d >= today && d < new Date('2026-09-01'); }).reduce(function(s, x) { return s + x.outstanding; }, 0)) + '</div><div class="sub">September due dates</div></div>' +
-    '<div class="stat-card green"><div class="label">Collection Rate</div><div class="value">0%</div><div class="sub">No payments recorded yet</div></div>';
+  document.getElementById('aging-kpi-grid').innerHTML =
+    '<div class="stat-card"><div class="label">Cumulative Delivered (F&B)</div><div class="value">' + fmtBDT(totalBilled) + '</div><div class="sub">325 deliveries, 53 customers</div></div>' +
+    '<div class="stat-card red"><div class="label">Payment Posting Status</div><div class="value">0 / 325</div><div class="sub">Deliveries marked as paid</div></div>' +
+    '<div class="stat-card amber"><div class="label">Data Quality</div><div class="value">BROKEN</div><div class="sub">Aging cannot be computed</div></div>' +
+    '<div class="stat-card green"><div class="label">Top Customer</div><div class="value">DIVINE TRADE</div><div class="sub">BDT 3.75 Cr delivered</div></div>';
 
-  // Aging chart
   var labels = AGING_DATA.map(function(x) { return x.customer.length > 18 ? x.customer.substring(0, 16) + '...' : x.customer; });
   if (window.Chart) {
     new Chart(document.getElementById('chartAging'), {
       type: 'bar', data: { labels: labels, datasets: [
-        { label: 'Total Billed', data: AGING_DATA.map(function(x) { return x.billed; }), backgroundColor: '#0f3460', borderRadius: 4 },
-        { label: 'Outstanding', data: AGING_DATA.map(function(x) { return x.outstanding; }), backgroundColor: '#dc2626', borderRadius: 4 }
+        { label: 'Delivered Value (BDT)', data: AGING_DATA.map(function(x) { return x.billed; }), backgroundColor: '#0f3460', borderRadius: 4 }
       ]},
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { ticks: { callback: function(v) { return (v / 100000).toFixed(1) + 'L'; } } } } }
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: function(v) { return (v / 10000000).toFixed(1) + ' Cr'; } } } } }
     });
   }
 }
 
-// ===== COLLECTION DATA FROM DWH =====
+// ===== COLLECTION DATA FROM DWH (bank journal "Sales amount received", Aug 2026) =====
+// F&B customers classified by name; excludes fruits/bulk (Tisha/Ayman/AL-BAITULLAH fruits, A.F/Farjana/Al Barakha/Jowel/Maa Babar Doya/Bismillah Enterprise bulk). VERIFY flag = classification not yet confirmed via Customer Profile.
 var COLLECTION_DATA = [
-  { customer: 'DIVINE TRADE INTERNATIONAL', collected: 1062200, entries: 1, sp: 'Abul Hasnat M. Rafique' },
-  { customer: 'EVEREST TRADE INTERNATIONAL', collected: 685280, entries: 1, sp: 'Md Tarequr Rahman' },
-  { customer: 'M/S RENA ENTERPRISE', collected: 524826, entries: 6, sp: 'Idris Howlader' },
-  { customer: '5A BUSINESS CENTER', collected: 362250, entries: 3, sp: 'Abul Hasnat M. Rafique' },
-  { customer: 'M/S SAMIR AFNAN TRADE INT\'L', collected: 300000, entries: 3, sp: 'Md Tarequr Rahman' },
-  { customer: 'ISI TRADERS', collected: 284000, entries: 2, sp: 'Md Mamunur Rashid' },
-  { customer: 'M/S ABBAS & BROTHERS', collected: 252442, entries: 4, sp: 'Idris Howlader' },
-  { customer: 'ABDULLAH TRADERS', collected: 200000, entries: 1, sp: 'Md Tarequr Rahman' },
-  { customer: 'TAPOSH TRADERS', collected: 137460, entries: 1, sp: 'Md Tarequr Rahman' },
-  { customer: 'ANISHA ENTERPRISE', collected: 116650, entries: 1, sp: 'Md Mamunur Rashid' },
-  { customer: 'MOTALEB STORE', collected: 100000, entries: 1, sp: 'Md Mamunur Rashid' },
-  { customer: 'M/S PROTHI ENTERPRISE', collected: 54000, entries: 1, sp: 'Idris Howlader' },
-  { customer: 'M/S TAMZID ENTERPRISE', collected: 50000, entries: 1, sp: 'Md Mamunur Rashid' },
-  { customer: 'M/S SUMON ENTERPRISE', collected: 31680, entries: 1, sp: 'Idris Howlader' },
-  { customer: 'BISMILLAH TRADE INT\'L', collected: 20000, entries: 1, sp: 'Md Mamunur Rashid' }
+  { customer: 'DIVINE TRADE INTERNATIONAL', collected: 2062200, entries: 3, sp: 'F&B' },
+  { customer: '5A BUSINESS CENTER', collected: 1662250, entries: 7, sp: 'F&B (MT)' },
+  { customer: 'EVEREST TRADE INTERNATIONAL', collected: 917370, entries: 2, sp: 'F&B' },
+  { customer: 'M/S RENA ENTERPRISE', collected: 624666, entries: 8, sp: 'F&B' },
+  { customer: 'M/S ABBAS & BROTHERS', collected: 465142, entries: 8, sp: 'F&B' },
+  { customer: 'M/S SAMIR AFNAN TRADE INTERNATIONAL', collected: 400000, entries: 4, sp: 'F&B' },
+  { customer: 'ISI TRADERS', collected: 284000, entries: 2, sp: 'F&B' },
+  { customer: 'ABDULLAH TRADERS', collected: 272940, entries: 2, sp: 'F&B' },
+  { customer: 'H M Z TRADING', collected: 240000, entries: 1, sp: 'F&B' },
+  { customer: 'M AND Z ENTERPRISE', collected: 207156, entries: 1, sp: 'F&B' },
+  { customer: 'MOTALEB STORE', collected: 200000, entries: 2, sp: 'F&B' },
+  { customer: 'M/S TAMZID ENTERPRISE', collected: 150000, entries: 3, sp: 'F&B' },
+  { customer: 'TAPOSH TRADERS', collected: 137460, entries: 1, sp: 'F&B' },
+  { customer: 'ANISHA ENTERPRISE', collected: 121500, entries: 2, sp: 'F&B' },
+  { customer: 'DHAKA TRADERS & SUPPLIERS', collected: 110000, entries: 2, sp: 'F&B' },
+  { customer: 'M/S KAWSAR ENTERPRISE', collected: 70000, entries: 2, sp: 'F&B' },
+  { customer: 'M/S PROTHI ENTERPRISE', collected: 54000, entries: 1, sp: 'F&B' },
+  { customer: 'BISMILLAH TRADE INTERNATIONAL', collected: 42724, entries: 3, sp: 'F&B' },
+  { customer: 'M/S SUMON ENTERPRISE', collected: 31680, entries: 1, sp: 'F&B' },
+  { customer: 'SHAHABUDDIN & BROTHERS', collected: 5000, entries: 1, sp: 'F&B' },
+  { customer: 'BJ ENTERPRISE', collected: 5000, entries: 1, sp: 'F&B' }
 ];
 
-var COLLECTION_TOTAL = 4180788;
+var COLLECTION_TOTAL = 8063088; // F&B-only (name-based, Aug MTD to Aug 25)
 var COLLECTION_TARGET = Math.round(0.8 * 19049403);
 
 function buildCollectionPage() {
@@ -910,26 +919,26 @@ function buildCollectionPage() {
 
   document.getElementById('coll-kpi-grid').innerHTML = 
     '<div class="stat-card"><div class="label">Aug Collection Target (80% of Sales)</div><div class="value">' + fmtBDT(COLLECTION_TARGET) + '</div><div class="sub">80% x BDT 1.90 Cr ABP</div></div>' +
-    '<div class="stat-card green"><div class="label">Total Collected (MTD)</div><div class="value">' + fmtBDT(COLLECTION_TOTAL) + '</div><div class="sub">' + COLLECTION_DATA.length + ' F&B customers</div></div>' +
-    '<div class="stat-card"><div class="label">Collection Achievement</div><div class="value">' + Math.round((COLLECTION_TOTAL / COLLECTION_TARGET) * 100) + '%</div><div class="sub">Vs 80% of ABP target</div></div>' +
-    '<div class="stat-card cyan"><div class="label">Top Collector</div><div class="value">DIVINE TRADE</div><div class="sub">BDT ' + fmtBDT(1062200) + '</div></div>';
+    '<div class="stat-card green"><div class="label">F&B Collected (MTD)</div><div class="value">' + fmtBDT(COLLECTION_TOTAL) + '</div><div class="sub">' + COLLECTION_DATA.length + ' customers (name-based)</div></div>' +
+    '<div class="stat-card green"><div class="label">Collection Achievement</div><div class="value">' + Math.round((COLLECTION_TOTAL / COLLECTION_TARGET) * 100) + '%</div><div class="sub">Vs 80% of ABP target</div></div>' +
+    '<div class="stat-card amber"><div class="label">Classification</div><div class="value">F&amp;B ONLY</div><div class="sub">Fruits/bulk excluded by name</div></div>';
 
   var html = '';
   var i;
   for (i = 0; i < COLLECTION_DATA.length; i++) {
     var c = COLLECTION_DATA[i];
+    var isVerify = c.sp === 'VERIFY';
     html += '<tr>' +
-      '<td><strong>' + c.customer + '</strong></td>' +
+      '<td><strong>' + c.customer + '</strong>' + (isVerify ? ' <span class="tag tag-slow">VERIFY</span>' : '') + '</td>' +
       '<td class="num">' + c.entries + '</td>' +
       '<td class="num" style="font-weight:700;color:var(--good)">' + fmtBDT(c.collected) + '</td>' +
       '<td>' + c.sp + '</td>' +
-      '<td><span class="tag tag-fast">COLLECTED</span></td>' +
+      '<td>' + (isVerify ? '<span class="tag tag-slow">CONFIRM TYPE</span>' : '<span class="tag tag-fast">COLLECTED</span>') + '</td>' +
     '</tr>';
   }
   document.getElementById('coll-tbody').innerHTML = html;
-  document.getElementById('coll-summary').innerHTML = 'Total F&B Collection (Aug MTD): <strong>' + fmtBDT(COLLECTION_TOTAL) + '</strong> | Target: <strong>' + fmtBDT(COLLECTION_TARGET) + '</strong> | Achievement: <strong>' + Math.round((COLLECTION_TOTAL / COLLECTION_TARGET) * 100) + '%</strong> | 15 customers paid | Source: fin.tblBankJournalHeaderArc';
+  document.getElementById('coll-summary').innerHTML = 'F&B collection (Aug MTD to Aug 25, name-based): <strong>' + fmtBDT(COLLECTION_TOTAL) + '</strong> | Target: <strong>' + fmtBDT(COLLECTION_TARGET) + '</strong> | Achievement: <strong>' + Math.round((COLLECTION_TOTAL / COLLECTION_TARGET) * 100) + '%</strong> | Fruits/bulk customers (Tisha, Ayman, A.F Enterprise, Farjana, Jowel, Maa Babar Doya, Bismillah Enterprise, TFSONS, Naria, Khadiza) excluded | Source: fin.tblBankJournalHeaderArc';
 
-  // Collection chart
   var collLabels = COLLECTION_DATA.map(function(x) { return x.customer.length > 16 ? x.customer.substring(0, 14) + '...' : x.customer; });
   var collValues = COLLECTION_DATA.map(function(x) { return x.collected; });
   if (window.Chart) {
@@ -941,10 +950,11 @@ function buildCollectionPage() {
 }
 
 // ===== FINANCIAL OVERVIEW (PC 818 ONLY) =====
+// Revenue & COGS: monthly actuals from fin.tblAccountingJournalArc (as of 23 Aug). Opex: FYTD totals split Jul (closed) / Aug (derived = FYTD - Jul).
 var PL_DATA = {
   jul: {
-    revenue: 16781255,     
-    cogs: 15948171,        
+    revenue: 16781255,
+    cogs: 15948171,
     sellingExp: 590137,
     adminExp: 651989,
     logisticsExp: 588233,
@@ -956,16 +966,16 @@ var PL_DATA = {
     taxExp: 110363
   },
   aug: {
-    revenue: 3321982,
-    cogs: 3322841,
-    sellingExp: 373108,
-    adminExp: 72072,
-    logisticsExp: 119244,
-    marketingExp: 20728,
-    mroExp: -3580,
-    mfgExp: 6215,
-    depreciation: 705,
-    financialExp: -1787,
+    revenue: 5858509,
+    cogs: 6194364,
+    sellingExp: 698865,
+    adminExp: 166616,
+    logisticsExp: 181897,
+    marketingExp: 40114,
+    mroExp: -13031,
+    mfgExp: 15665,
+    depreciation: 1691,
+    financialExp: 105894,
     taxExp: 0
   }
 };
@@ -1041,21 +1051,6 @@ function buildFinancePage() {
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', function() {
   buildOverview();
-  setHeaderDate();
 });
-
-function setHeaderDate() {
-  var now = new Date();
-  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  document.getElementById('header-date').textContent = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
-}
-
-function refreshDashboard() {
-  var btn = document.getElementById('btnRefresh');
-  btn.innerHTML = '<span class="spinner">⟳</span> Refreshing...';
-  btn.classList.add('loading');
-  setTimeout(function() { location.reload(true); }, 800);
-}
 </script>
 </html>
-
