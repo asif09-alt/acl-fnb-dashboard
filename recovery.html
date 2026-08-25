@@ -268,8 +268,8 @@ td b{color:var(--text)}
 
   <div class="gauges">
     <div class="gauge"><p class="gname">LCs (BU 221)</p><p class="gvalue">162</p><p class="gsub">USD 45.84 M · BDT 5,356 M</p></div>
-    <div class="gauge"><p class="gname">Open / Incomplete LCs</p><p class="gvalue gv warn">40</p><p class="gsub">BDT 1,341 M exposure</p></div>
-    <div class="gauge"><p class="gname">F&amp;B-specific LCs</p><p class="gvalue">9</p><p class="gsub">BDT 51.7 M · 2 open = 15.5 M</p></div>
+    <div class="gauge"><p class="gname">Genuinely Open F&amp;B LCs</p><p class="gvalue gv pos">0</p><p class="gsub">All F&amp;B LCs executed — verified 25 Aug</p></div>
+    <div class="gauge"><p class="gname">F&amp;B-specific LCs</p><p class="gvalue">9</p><p class="gsub">BDT 51.7 M · all received into WH 10738</p></div>
     <div class="gauge"><p class="gname">Reported Payable</p><p class="gvalue gv neg">87.85 Cr</p><p class="gsub">Fruits-inclusive — not F&amp;B</p></div>
   </div>
 
@@ -278,6 +278,18 @@ td b{color:var(--text)}
       <thead><tr><th>Action</th><th>Quantified deliverable</th><th>Owner</th><th>Deadline</th></tr></thead>
       <tbody id="lc-tbody"></tbody>
     </table>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>LC status verification — 25 Aug 2026 (corrected)</h3>
+    <p><b style="color:var(--text)">There are NO genuinely open F&amp;B LCs.</b> The earlier "40 open/incomplete LCs (BDT 1,341M)" figure was a <b style="color:var(--text)">data artifact</b>:</p>
+    <ul>
+      <li>The 40 counted <code>isComplete=0</code> across <b>all of BU 221</b> — 31 are fresh fruits/dates (WH 10530), 7 are raw cotton (WH 10930) — all OUT of F&amp;B scope.</li>
+      <li>Only <b>2 of the 40</b> are F&amp;B (WH 10738): LC 11795 (BDT 8.75 M) and LC 11980 (BDT 6.79 M) — both <b>fully executed</b>: goods received into WH 10738 (Oct 2025 / Jan 2026), LC expiry dates (Aug/Sep 2025) long past.</li>
+      <li>The <code>isComplete</code> flag is <b>not maintained</b> — <code>intClosingJournalId</code> is NULL for all 162 LCs, including the 117 marked "complete".</li>
+      <li>2 NULL-status F&amp;B LCs (12459, 12518) also executed — goods received Jun–Aug 2026.</li>
+    </ul>
+    <div class="note">Verdict: 0 genuinely open F&amp;B LCs. Data-hygiene fix: Commercial to update isComplete=1 for the 4 executed F&amp;B LCs (11795, 11980, 12459, 12518) for record-keeping. Source: DWH com.tblLetterOfCreditArc + wms receipts + LC Tracking sheet cross-check.</div>
   </div>
 </section>
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -167,7 +167,7 @@ td b{color:var(--text)}
     <div class="gauge"><p class="gname">F&amp;B COGS FY26 YTD</p><p class="gvalue">BDT 2.21 Cr</p><p class="gsub">PC 818 · Jul–Aug 2026</p></div>
     <div class="gauge"><p class="gname">Gross Margin FYTD</p><p class="gvalue gv pos">+2.2%</p><p class="gsub">MTD Aug 2026 −5.6% (negative)</p></div>
     <div class="gauge"><p class="gname">WH 10738 Stock</p><p class="gvalue">BDT 3.40 Cr</p><p class="gsub">119,299 units · 253 SKUs · ledger net</p></div>
-    <div class="gauge"><p class="gname">Import LCs (BU 221)</p><p class="gvalue gv warn">BDT 535.7 Cr</p><p class="gsub">162 LCs · 40 open · F&amp;B subset 9 LCs</p></div>
+    <div class="gauge"><p class="gname">Import LCs (BU 221)</p><p class="gvalue gv warn">BDT 535.7 Cr</p><p class="gsub">162 LCs · 0 genuinely open F&amp;B</p></div>
     <div class="gauge"><p class="gname">Batch / Expiry</p><p class="gvalue gv neg">0 / 748</p><p class="gsub">no batch table · no expiry flags</p></div>
   </div>
 
@@ -272,7 +272,7 @@ td b{color:var(--text)}
       <ul>
         <li><b style="color:var(--text)">Unbooked inventory</b> ≈ 33.2 M (WH 10738 ledger vs GL 0.80 M)</li>
         <li><b style="color:var(--text)">Perishable risk</b> — Milk 8.49 M + Canned 6.39 M + Beverage 6.24 M with no batch/expiry discipline</li>
-        <li><b style="color:var(--text)">Import pipeline</b> — 162 LCs / 5,356 M drawdown (BU-wide); F&amp;B subset 9 LCs / 51.7 M, 2 open = 15.5 M</li>
+        <li><b style="color:var(--text)">Import pipeline</b> — 162 LCs / 5,356 M drawdown (BU-wide); F&amp;B subset 9 LCs / 51.7 M · 0 open (all executed)</li>
         <li><b style="color:var(--text)">Receivables</b> — 325 deliveries / 128.07 M cumulative delivered; aging unreliable (payment flag unmaintained)</li>
         <li><b style="color:var(--text)">Collections Aug MTD</b> — 8.06 M collected (21 F&amp;B customers, name-based)</li>
       </ul>
@@ -570,8 +570,8 @@ const EV=[
 ["F&B SKUs on hand (WH 10738)","253 · 119,299 units · BDT 33.99 M","wms.tblInventoryTransactionRowArc net","Verified"],
 ["Business partners","540 · 273 sup / 239 cust","prt.tblBusinessPartnerArc","Verified"],
 ["Purchase orders","656 · 640 approved","pro.tblPurchaseOrderHeaderArc","Verified"],
-["LCs (BU 221)","162 At Sight · 5,356 M BDT · FX ~123 · 40 open","com.tblLetterOfCreditArc","Verified"],
-["F&B-specific LCs","9 (Ready Food / Canned Tuna / Chicken Powder) · 51.7 M · 2 open","com.tblLetterOfCreditArc (name-based)","Medium"],
+["LCs (BU 221)","162 At Sight · 5,356 M BDT · FX ~123 · 0 genuinely open F&amp;B","com.tblLetterOfCreditArc","Verified"],
+["F&B-specific LCs","9 (Ready Food / Canned Tuna / Chicken Powder) · 51.7 M · 0 open (all executed)","com.tblLetterOfCreditArc (name-based)","Medium"],
 ["Import shipments (BU 221)","973 headers · 1,347 rows · USD 51.07 M","com.tblImportShipmentHeaderArc","Verified"],
 ["Import costing / landed cost","6,744 rows · BDT 12,903 M (BU-wide, bulk-dominated)","com.tblCommercialCostingArc","Verified"],
 ["Inventory batch","0","wms.tblInventoryBatch","Verified"],
@@ -669,3 +669,5 @@ show("verdict");
 </script>
 </body>
 </html>
+
+
